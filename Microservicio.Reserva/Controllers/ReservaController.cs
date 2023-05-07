@@ -58,8 +58,16 @@ namespace Microservicio.Reserva.Controllers
         [ProducesResponseType(typeof(ReservaResponse), 200)]
         [ProducesResponseType(typeof(BadRequest), 400)]
         [ProducesResponseType(typeof(BadRequest), 404)]
+        [ProducesResponseType(typeof(BadRequest), 409)]
         public IActionResult RemoveReserva(int id)
         {
+            if (_service.ExisteReservaPagada(id))
+            {
+                return Conflict(new BadRequest
+                {
+                    Message = $"La reserva con id '{id}' que intenta borrar se encuentra pagada"
+                });
+            }
             try
             {
                 var result = _service.RemoveReserva(id);

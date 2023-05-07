@@ -24,7 +24,7 @@ namespace Infrastructure.Command
         public Factura RemoveFactura(int facturaId)
         {
             var factura = _context.Facturas
-                .FirstOrDefault(x => x.FacturaId == facturaId);
+            .FirstOrDefault(x => x.FacturaId == facturaId);
 
             _context.Remove(factura);
             _context.SaveChanges();

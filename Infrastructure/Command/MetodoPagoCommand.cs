@@ -24,7 +24,7 @@ namespace Infrastructure.Command
         public MetodoPago RemoveMetodoPago(int metodoPagoId)
         {
             var metodoPago = _context.MetodoPagos
-                .FirstOrDefault(x => x.MetodoPagoId == metodoPagoId);
+            .FirstOrDefault(x => x.MetodoPagoId == metodoPagoId);
 
             _context.Remove(metodoPago);
             _context.SaveChanges();

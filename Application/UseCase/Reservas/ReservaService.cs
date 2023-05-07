@@ -26,7 +26,6 @@ namespace Application.UseCase.Reservas
             return _query.GetReservaList();
         }
 
-
         public List<ReservaResponse> GetReservaListFilters(string fecha, string clase, string orden)
         {
             var reservaList = _query.GetReservaListFilters(fecha, clase, orden);
@@ -113,6 +112,11 @@ namespace Application.UseCase.Reservas
                 Asiento = reserva.NumeroAsiento,
                 Clase = reserva.Clase,
             };
+        }
+
+        public bool ExisteReservaPagada(int id)
+        {
+            return _query.ExisteReservaPagada(id);
         }
     }
 }

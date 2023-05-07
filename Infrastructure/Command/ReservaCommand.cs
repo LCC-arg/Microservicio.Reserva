@@ -24,7 +24,7 @@ namespace Infrastructure.Command
         public Reserva RemoveReserva(int reservaId)
         {
             var reserva = _context.Reservas
-                .FirstOrDefault(x => x.ReservaId == reservaId);
+            .FirstOrDefault(x => x.ReservaId == reservaId);
 
             _context.Remove(reserva);
             _context.SaveChanges();

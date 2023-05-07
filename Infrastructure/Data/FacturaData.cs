@@ -13,7 +13,7 @@ namespace Infrastructure.Data
                 new Factura
                 {
                     FacturaId = 1,
-                    Estado = "Pagada",
+                    Estado = "Paga",
                     Monto = 2000,
                     Fecha = DateTime.Now.Date,
                     PagoId = 1,

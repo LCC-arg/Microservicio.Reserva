@@ -12,5 +12,6 @@ namespace Application.Interfaces
         ReservaResponse CreateReserva(ReservaRequest reserva);
         ReservaResponse RemoveReserva(int reservaId);
         ReservaResponse UpdateReserva(int reservaId, ReservaRequest request);
+        bool ExisteReservaPagada(int id);
     }
 }

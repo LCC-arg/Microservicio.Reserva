@@ -24,7 +24,7 @@ namespace Infrastructure.Command
         public Pasaje RemovePasaje(int pasajeId)
         {
             var pasaje = _context.Pasajes
-                .FirstOrDefault(x => x.PasajeId == pasajeId);
+            .FirstOrDefault(x => x.PasajeId == pasajeId);
 
             _context.Remove(pasaje);
             _context.SaveChanges();
