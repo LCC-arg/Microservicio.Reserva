@@ -4,6 +4,7 @@ using Application.UseCase.MetodosPagos;
 using Application.UseCase.Pagos;
 using Application.UseCase.Pasajes;
 using Application.UseCase.Reservas;
+using Application.UseServices;
 using Infrastructure.Command;
 using Infrastructure.Persistence;
 using Infrastructure.Querys;
@@ -21,6 +22,8 @@ builder.Services.AddSwaggerGen();
 // Custom
 var connectionString = builder.Configuration["ConnectionString"];
 builder.Services.AddDbContext<ReservaContext>(options => options.UseSqlServer(connectionString));
+
+builder.Services.AddScoped<IUserServiceUsuario, UserServiceUsuario>();
 
 builder.Services.AddScoped<IFacturaService, FacturaService>();
 builder.Services.AddScoped<IFacturaCommand, FacturaCommand>();

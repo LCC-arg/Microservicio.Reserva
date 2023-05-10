@@ -9,11 +9,13 @@ namespace Application.UseCase.Reservas
     {
         private readonly IReservaCommand _command;
         private readonly IReservaQuery _query;
+        private readonly IUserServiceUsuario _userServiceUsuario;
 
-        public ReservaService(IReservaCommand command, IReservaQuery query)
+        public ReservaService(IReservaCommand command, IReservaQuery query, IUserServiceUsuario userServiceUsuario)
         {
             _command = command;
             _query = query;
+            _userServiceUsuario = userServiceUsuario;
         }
 
         public Reserva GetReservaById(int reservaId)
@@ -56,6 +58,7 @@ namespace Application.UseCase.Reservas
                 Precio = request.Precio,
                 NumeroAsiento = request.NumeroAsiento,
                 Clase = request.Clase,
+                UsuarioId = request.UsuarioId
             };
 
             _command.InsertReserva(reserva);
@@ -67,6 +70,7 @@ namespace Application.UseCase.Reservas
                 Precio = reserva.Precio,
                 Asiento = reserva.NumeroAsiento,
                 Clase = reserva.Clase,
+                UsuarioNombre = _userServiceUsuario.ObtenerUsuario(request.UsuarioId).nombre,
             };
         }
 

@@ -54,8 +54,8 @@ namespace Infrastructure.Migrations
                         new
                         {
                             FacturaId = 1,
-                            Estado = "Pagada",
-                            Fecha = new DateTime(2023, 5, 6, 0, 0, 0, 0, DateTimeKind.Local),
+                            Estado = "Paga",
+                            Fecha = new DateTime(2023, 5, 9, 0, 0, 0, 0, DateTimeKind.Local),
                             Monto = 2000,
                             PagoId = 1
                         });
@@ -123,7 +123,7 @@ namespace Infrastructure.Migrations
                         new
                         {
                             PagoId = 1,
-                            Fecha = new DateTime(2023, 5, 6, 0, 0, 0, 0, DateTimeKind.Local),
+                            Fecha = new DateTime(2023, 5, 9, 0, 0, 0, 0, DateTimeKind.Local),
                             MetodoPagoId = 1,
                             Monto = 2000,
                             ReservaId = 1
@@ -176,8 +176,8 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Precio")
                         .HasColumnType("int");
 
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("ViajeId")
                         .HasColumnType("int");
@@ -191,11 +191,11 @@ namespace Infrastructure.Migrations
                         {
                             ReservaId = 1,
                             Clase = "Alta",
-                            Fecha = new DateTime(2023, 5, 6, 0, 0, 0, 0, DateTimeKind.Local),
+                            Fecha = new DateTime(2023, 5, 9, 0, 0, 0, 0, DateTimeKind.Local),
                             NumeroAsiento = 4,
                             PasajeroId = 0,
                             Precio = 2000,
-                            UsuarioId = 0,
+                            UsuarioId = new Guid("00000000-0000-0000-0000-000000000000"),
                             ViajeId = 0
                         });
                 });

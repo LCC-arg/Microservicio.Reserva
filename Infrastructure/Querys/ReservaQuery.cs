@@ -60,15 +60,14 @@ namespace Infrastructure.Querys
                 .ThenInclude(s => s.Factura)
                 .FirstOrDefault(x => x.ReservaId == reservaId);
 
-            if (reserva.Pago.Factura.Estado.ToLower() == "pagada")
+            if (reserva != null)
             {
-                return true;
+                if (reserva.Pago?.Factura?.Estado?.ToLower() == "paga")
+                {
+                    return true;
+                }
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
-
     }
 }
