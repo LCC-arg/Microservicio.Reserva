@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -7,7 +8,7 @@
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class MicroservicioReserva : Migration
+    public partial class MicroservicioReservaDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -126,17 +127,17 @@ namespace Infrastructure.Migrations
             migrationBuilder.InsertData(
                 table: "Reserva",
                 columns: new[] { "ReservaId", "Clase", "Fecha", "NumeroAsiento", "PasajeroId", "Precio", "UsuarioId", "ViajeId" },
-                values: new object[] { 1, "Alta", new DateTime(2023, 5, 9, 0, 0, 0, 0, DateTimeKind.Local), 4, 0, 2000, new Guid("00000000-0000-0000-0000-000000000000"), 0 });
+                values: new object[] { 1, "Alta", new DateTime(2023, 5, 12, 0, 0, 0, 0, DateTimeKind.Local), 4, 0, 2000, new Guid("00000000-0000-0000-0000-000000000000"), 0 });
 
             migrationBuilder.InsertData(
                 table: "Pago",
                 columns: new[] { "PagoId", "Fecha", "MetodoPagoId", "Monto", "ReservaId" },
-                values: new object[] { 1, new DateTime(2023, 5, 9, 0, 0, 0, 0, DateTimeKind.Local), 1, 2000, 1 });
+                values: new object[] { 1, new DateTime(2023, 5, 12, 0, 0, 0, 0, DateTimeKind.Local), 1, 2000, 1 });
 
             migrationBuilder.InsertData(
                 table: "Factura",
                 columns: new[] { "FacturaId", "Estado", "Fecha", "Monto", "PagoId" },
-                values: new object[] { 1, "Paga", new DateTime(2023, 5, 9, 0, 0, 0, 0, DateTimeKind.Local), 2000, 1 });
+                values: new object[] { 1, "Paga", new DateTime(2023, 5, 12, 0, 0, 0, 0, DateTimeKind.Local), 2000, 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Factura_PagoId",

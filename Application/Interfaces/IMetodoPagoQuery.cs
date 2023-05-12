@@ -6,5 +6,6 @@ namespace Application.Interfaces
     {
         MetodoPago GetMetodoPagoById(int metodoPagoId);
         List<MetodoPago> GetMetodoPagoList();
+        bool ExisteMetodoPagoDescripcion(string nombre);
     }
 }

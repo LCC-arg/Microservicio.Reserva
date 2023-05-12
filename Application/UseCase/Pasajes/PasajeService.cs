@@ -1,4 +1,6 @@
 ﻿using Application.Interfaces;
+using Application.Request;
+using Application.Response;
 using Domain.Entities;
 
 namespace Application.UseCase.Pasajes
@@ -8,15 +10,37 @@ namespace Application.UseCase.Pasajes
         private readonly IPasajeCommand _command;
         private readonly IPasajeQuery _query;
 
-        public PasajeService(IPasajeCommand command, IPasajeQuery query)
+        private readonly IReservaQuery _reservaQuery;
+
+        public PasajeService(IPasajeCommand command, IPasajeQuery query, IReservaQuery reservaQuery)
         {
             _command = command;
             _query = query;
+            _reservaQuery = reservaQuery;
         }
 
-        public Pasaje GetPasajeById(int pasajeId)
+        public PasajeResponse GetPasajeById(int pasajeId)
         {
-            return _query.GetPasajeById(pasajeId);
+            var pasaje = _query.GetPasajeById(pasajeId);
+
+            if (pasaje == null)
+            {
+                throw new ArgumentException($"No se encontró el pasaje con el identificador {pasajeId}.");
+            }
+
+            return new PasajeResponse
+            {
+                Id = pasaje.PasajeId,
+                Nota = pasaje.Nota,
+                Reserva = new ReservaResponse
+                {
+                    Id = pasaje.Reserva.ReservaId,
+                    Fecha = pasaje.Reserva.Fecha,
+                    Precio = pasaje.Reserva.Precio,
+                    Asiento = pasaje.Reserva.NumeroAsiento,
+                    Clase = pasaje.Reserva.Clase,
+                },
+            };
         }
 
         public List<Pasaje> GetPasajeList()
@@ -24,21 +48,99 @@ namespace Application.UseCase.Pasajes
             return _query.GetPasajeList();
         }
 
-        public Pasaje CreatePasaje(Pasaje pasaje)
+        public PasajeResponse CreatePasaje(PasajeRequest request)
         {
-            return _command.InsertPasaje(pasaje);
+            var reserva = _reservaQuery.GetReservaById(request.Reserva);
+
+            if (reserva == null)
+            {
+                throw new ArgumentException($"No se encontró la reserva con el identificador {request.Reserva}.");
+            }
+
+            var pasaje = new Pasaje
+            {
+                Nota = request.Nota,
+                ReservaId = request.Reserva,
+                Reserva = reserva,
+            };
+
+            _command.InsertPasaje(pasaje);
+
+            return new PasajeResponse
+            {
+                Id = pasaje.PasajeId,
+                Nota = pasaje.Nota,
+                Reserva = new ReservaResponse
+                {
+                    Id = reserva.ReservaId,
+                    Fecha = reserva.Fecha,
+                    Precio = reserva.Precio,
+                    Asiento = reserva.NumeroAsiento,
+                    Clase = reserva.Clase,
+                },
+            };
         }
 
-        public Pasaje RemovePasaje(int pasajeId)
+        public PasajeResponse RemovePasaje(int pasajeId)
         {
-            return _command.RemovePasaje(pasajeId);
+            if (_query.GetPasajeById(pasajeId) == null)
+            {
+                throw new ArgumentException($"No se encontró el pasaje que desea eliminar con el identificador '{pasajeId}'.");
+            }
+
+            var pasaje = _command.RemovePasaje(pasajeId);
+
+            return new PasajeResponse
+            {
+                Id = pasaje.PasajeId,
+                Nota = pasaje.Nota,
+                Reserva = new ReservaResponse
+                {
+                    Id = pasaje.Reserva.ReservaId,
+                    Fecha = pasaje.Reserva.Fecha,
+                    Precio = pasaje.Reserva.Precio,
+                    Asiento = pasaje.Reserva.NumeroAsiento,
+                    Clase = pasaje.Reserva.Clase,
+                },
+            };
         }
 
-        public Pasaje UpdatePasaje(int pasajeId)
+        public PasajeResponse UpdatePasaje(int pasajeId, PasajeRequest request)
         {
             var pasaje = _query.GetPasajeById(pasajeId);
 
-            return _command.UpdatePasaje(pasaje);
+            var reserva = _reservaQuery.GetReservaById(request.Reserva);
+
+            if (pasaje == null)
+            {
+                throw new ArgumentException($"No se encontró el pasaje con el identificador {pasajeId}.");
+            }
+
+            if (reserva == null)
+            {
+                throw new ArgumentException($"No se encontró la reserva con el identificador {request.Reserva}.");
+            }
+
+            pasaje.Nota = request.Nota;
+            pasaje.ReservaId = request.Reserva;
+            pasaje.Reserva = reserva;
+
+
+            _command.UpdatePasaje(pasaje);
+
+            return new PasajeResponse
+            {
+                Id = pasaje.PasajeId,
+                Nota = pasaje.Nota,
+                Reserva = new ReservaResponse
+                {
+                    Id = reserva.ReservaId,
+                    Fecha = reserva.Fecha,
+                    Precio = reserva.Precio,
+                    Asiento = reserva.NumeroAsiento,
+                    Clase = reserva.Clase,
+                },
+            };
         }
     }
 }

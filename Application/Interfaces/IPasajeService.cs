@@ -1,13 +1,15 @@
-﻿using Domain.Entities;
+﻿using Application.Request;
+using Application.Response;
+using Domain.Entities;
 
 namespace Application.Interfaces
 {
     public interface IPasajeService
     {
-        Pasaje GetPasajeById(int pasajeId);
+        PasajeResponse GetPasajeById(int pasajeId);
         List<Pasaje> GetPasajeList();
-        Pasaje CreatePasaje(Pasaje pasaje);
-        Pasaje RemovePasaje(int pasajeId);
-        Pasaje UpdatePasaje(int pasajeId);
+        PasajeResponse CreatePasaje(PasajeRequest request);
+        PasajeResponse RemovePasaje(int pasajeId);
+        PasajeResponse UpdatePasaje(int pasajeId, PasajeRequest request);
     }
 }

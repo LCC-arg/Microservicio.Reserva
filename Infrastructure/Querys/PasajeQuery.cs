@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Querys
 {
@@ -15,7 +16,9 @@ namespace Infrastructure.Querys
 
         public Pasaje GetPasajeById(int pasajeId)
         {
-            var pasaje = _context.Pasajes.FirstOrDefault(x => x.PasajeId == pasajeId);
+            var pasaje = _context.Pasajes
+                .Include(s => s.Reserva)
+                .FirstOrDefault(x => x.PasajeId == pasajeId);
 
             return pasaje;
         }

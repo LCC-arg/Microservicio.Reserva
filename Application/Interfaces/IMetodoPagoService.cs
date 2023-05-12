@@ -1,13 +1,15 @@
-﻿using Domain.Entities;
+﻿using Application.Request;
+using Application.Response;
 
 namespace Application.Interfaces
 {
     public interface IMetodoPagoService
     {
-        MetodoPago GetMetodoPagoById(int metodoPagoId);
-        List<MetodoPago> GetMetodoPagoList();
-        MetodoPago CreateMetodoPago(MetodoPago metodoPago);
-        MetodoPago RemoveMetodoPago(int metodoPagoId);
-        MetodoPago UpdateMetodoPago(int metodoPagoId);
+        MetodoPagoResponse GetMetodoPagoById(int metodoPagoId);
+        List<MetodoPagoResponse> GetMetodoPagoList();
+        MetodoPagoResponse CreateMetodoPago(MetodoPagoRequest metodoPago);
+        MetodoPagoResponse RemoveMetodoPago(int metodoPagoId);
+        MetodoPagoResponse UpdateMetodoPago(int metodoPagoId, MetodoPagoRequest request);
+        bool ExisteMetodoPagoDescripcion(string nombre);
     }
 }

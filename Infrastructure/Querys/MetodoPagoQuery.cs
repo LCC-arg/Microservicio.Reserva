@@ -26,5 +26,20 @@ namespace Infrastructure.Querys
 
             return metodoPagoList;
         }
+
+        public bool ExisteMetodoPagoDescripcion(string nombre)
+        {
+            bool existeMetodoPago = _context.MetodoPagos
+                .Any(x => x.Descripcion.ToLower() == nombre.ToLower());
+
+            if (existeMetodoPago)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

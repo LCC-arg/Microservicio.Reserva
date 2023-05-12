@@ -1,13 +1,17 @@
-﻿using Domain.Entities;
+﻿using Application.Request;
+using Application.Response;
+using Domain.Entities;
 
 namespace Application.Interfaces
 {
     public interface IPagoService
     {
-        Pago GetPagoById(int pagoId);
+        PagoResponse GetPagoById(int pagoId);
         List<Pago> GetPagoList();
-        Pago CreatePago(Pago pago);
+        List<PagoResponse> GetPagoListFilters(int metodoPago, string fecha, int monto, string orden);
+        PagoResponse CreatePago(PagoRequest pago);
         Pago RemovePago(int pagoId);
         Pago UpdatePago(int pagoId);
+        bool ExisteReservaPagada(int reservaId);
     }
 }

@@ -7,39 +7,42 @@ namespace Microservicio.Reserva.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ReservaController : ControllerBase
+    public class PasajeController : ControllerBase
     {
-        private readonly IReservaService _service;
+        private readonly IPasajeService _service;
 
-        public ReservaController(IReservaService service)
+        public PasajeController(IPasajeService service)
         {
             _service = service;
         }
 
-        [HttpGet]
-        [ProducesResponseType(typeof(ReservaResponse), 200)]
-        public IActionResult GetReservaListFilters(string? fecha, string? clase, string? orden = "ASC")
-        {
-            var result = _service.GetReservaListFilters(fecha, clase, orden);
-            return new JsonResult(result);
-        }
-
         [HttpPost]
-        [ProducesResponseType(typeof(ReservaResponse), 201)]
-        public IActionResult CreateReserva(ReservaRequest request)
-        {
-            var result = _service.CreateReserva(request);
-            return new JsonResult(result) { StatusCode = 201 };
-        }
-
-        [HttpGet("{id}")]
-        [ProducesResponseType(typeof(ReservaResponse), 200)]
+        [ProducesResponseType(typeof(PasajeResponse), 201)]
         [ProducesResponseType(typeof(BadRequest), 404)]
-        public IActionResult GetReservaById(int id)
+        public IActionResult CreatePasaje(PasajeRequest request)
         {
             try
             {
-                var result = _service.GetReservaById(id);
+                var result = _service.CreatePasaje(request);
+                return new JsonResult(result) { StatusCode = 201 };
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new BadRequest
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(PasajeRequest), 200)]
+        [ProducesResponseType(typeof(BadRequest), 404)]
+        public IActionResult GetPasajeById(int id)
+        {
+            try
+            {
+                var result = _service.GetPasajeById(id);
                 return new JsonResult(result);
             }
             catch (Exception ex)
@@ -51,14 +54,14 @@ namespace Microservicio.Reserva.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        [ProducesResponseType(typeof(ReservaResponse), 200)]
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(PasajeRequest), 200)]
         [ProducesResponseType(typeof(BadRequest), 404)]
-        public IActionResult UpdateMercaderia(int id, ReservaRequest request)
+        public IActionResult RemovePasaje(int id)
         {
             try
             {
-                var result = _service.UpdateReserva(id, request);
+                var result = _service.RemovePasaje(id);
                 return new JsonResult(result);
             }
             catch (ArgumentException ex)
@@ -70,14 +73,14 @@ namespace Microservicio.Reserva.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
-        [ProducesResponseType(typeof(ReservaResponse), 200)]
+        [HttpPut("{id}")]
+        [ProducesResponseType(typeof(PasajeRequest), 200)]
         [ProducesResponseType(typeof(BadRequest), 404)]
-        public IActionResult RemoveReserva(int id)
+        public IActionResult UpdatePasaje(int id, PasajeRequest request)
         {
             try
             {
-                var result = _service.RemoveReserva(id);
+                var result = _service.UpdatePasaje(id, request);
                 return new JsonResult(result);
             }
             catch (ArgumentException ex)
@@ -88,5 +91,7 @@ namespace Microservicio.Reserva.Controllers
                 });
             }
         }
+
+
     }
 }

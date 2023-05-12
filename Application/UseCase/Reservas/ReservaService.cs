@@ -18,9 +18,23 @@ namespace Application.UseCase.Reservas
             _userServiceUsuario = userServiceUsuario;
         }
 
-        public Reserva GetReservaById(int reservaId)
+        public ReservaResponse GetReservaById(int reservaId)
         {
-            return _query.GetReservaById(reservaId);
+            var reserva = _query.GetReservaById(reservaId);
+
+            if (reserva == null)
+            {
+                throw new ArgumentException($"No se encontró la reserva con el identificador {reservaId}.");
+            }
+
+            return new ReservaResponse
+            {
+                Id = reserva.ReservaId,
+                Fecha = reserva.Fecha,
+                Precio = reserva.Precio,
+                Asiento = reserva.NumeroAsiento,
+                Clase = reserva.Clase,
+            };
         }
 
         public List<Reserva> GetReservaList()
@@ -70,7 +84,6 @@ namespace Application.UseCase.Reservas
                 Precio = reserva.Precio,
                 Asiento = reserva.NumeroAsiento,
                 Clase = reserva.Clase,
-                UsuarioNombre = _userServiceUsuario.ObtenerUsuario(request.UsuarioId).nombre,
             };
         }
 
@@ -116,11 +129,6 @@ namespace Application.UseCase.Reservas
                 Asiento = reserva.NumeroAsiento,
                 Clase = reserva.Clase,
             };
-        }
-
-        public bool ExisteReservaPagada(int id)
-        {
-            return _query.ExisteReservaPagada(id);
         }
     }
 }

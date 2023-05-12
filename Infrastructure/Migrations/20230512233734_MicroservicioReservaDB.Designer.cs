@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ReservaContext))]
-    [Migration("20230510021822_MicroservicioReserva")]
-    partial class MicroservicioReserva
+    [Migration("20230512233734_MicroservicioReservaDB")]
+    partial class MicroservicioReservaDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -58,7 +58,7 @@ namespace Infrastructure.Migrations
                         {
                             FacturaId = 1,
                             Estado = "Paga",
-                            Fecha = new DateTime(2023, 5, 9, 0, 0, 0, 0, DateTimeKind.Local),
+                            Fecha = new DateTime(2023, 5, 12, 0, 0, 0, 0, DateTimeKind.Local),
                             Monto = 2000,
                             PagoId = 1
                         });
@@ -126,7 +126,7 @@ namespace Infrastructure.Migrations
                         new
                         {
                             PagoId = 1,
-                            Fecha = new DateTime(2023, 5, 9, 0, 0, 0, 0, DateTimeKind.Local),
+                            Fecha = new DateTime(2023, 5, 12, 0, 0, 0, 0, DateTimeKind.Local),
                             MetodoPagoId = 1,
                             Monto = 2000,
                             ReservaId = 1
@@ -194,7 +194,7 @@ namespace Infrastructure.Migrations
                         {
                             ReservaId = 1,
                             Clase = "Alta",
-                            Fecha = new DateTime(2023, 5, 9, 0, 0, 0, 0, DateTimeKind.Local),
+                            Fecha = new DateTime(2023, 5, 12, 0, 0, 0, 0, DateTimeKind.Local),
                             NumeroAsiento = 4,
                             PasajeroId = 0,
                             Precio = 2000,

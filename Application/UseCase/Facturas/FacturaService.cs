@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Response;
 using Domain.Entities;
 
 namespace Application.UseCase.Facturas
@@ -14,9 +15,43 @@ namespace Application.UseCase.Facturas
             _query = query;
         }
 
-        public Factura GetFacturaById(int facturaId)
+        public FacturaResponse GetFacturaById(int facturaId)
         {
-            return _query.GetFacturaById(facturaId);
+            var factura = _query.GetFacturaById(facturaId);
+
+            if (factura == null)
+            {
+                throw new ArgumentException($"No se encontró la factura con el identificador {facturaId}.");
+            }
+
+            return new FacturaResponse
+            {
+                Id = factura.FacturaId,
+                Estado = factura.Estado,
+                Fecha = factura.Fecha,
+                Monto = factura.Monto,
+                Pago = new PagoResponse
+                {
+                    Id = factura.Pago.PagoId,
+                    Fecha = factura.Pago.Fecha,
+                    Monto = factura.Pago.Monto,
+
+                    Reserva = new ReservaResponse
+                    {
+                        Id = factura.Pago.Reserva.ReservaId,
+                        Fecha = factura.Pago.Reserva.Fecha,
+                        Precio = factura.Pago.Reserva.Precio,
+                        Asiento = factura.Pago.Reserva.NumeroAsiento,
+                        Clase = factura.Pago.Reserva.Clase,
+                    },
+
+                    MetodoPago = new MetodoPagoResponse
+                    {
+                        Id = factura.Pago.MetodoPago.MetodoPagoId,
+                        Descripcion = factura.Pago.MetodoPago.Descripcion,
+                    }
+                }
+            };
         }
 
         public List<Factura> GetFacturaList()

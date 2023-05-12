@@ -1,10 +1,11 @@
-﻿using Domain.Entities;
+﻿using Application.Response;
+using Domain.Entities;
 
 namespace Application.Interfaces
 {
     public interface IFacturaService
     {
-        Factura GetFacturaById(int facturaId);
+        FacturaResponse GetFacturaById(int facturaId);
         List<Factura> GetFacturaList();
         Factura CreateFactura(Factura factura);
         Factura RemoveFactura(int facturaId);

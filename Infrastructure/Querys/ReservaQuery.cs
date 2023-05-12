@@ -1,7 +1,6 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
 using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Querys
 {
@@ -51,23 +50,6 @@ namespace Infrastructure.Querys
             }
 
             return reservaList;
-        }
-
-        public bool ExisteReservaPagada(int reservaId)
-        {
-            var reserva = _context.Reservas
-                .Include(s => s.Pago)
-                .ThenInclude(s => s.Factura)
-                .FirstOrDefault(x => x.ReservaId == reservaId);
-
-            if (reserva != null)
-            {
-                if (reserva.Pago?.Factura?.Estado?.ToLower() == "paga")
-                {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }
