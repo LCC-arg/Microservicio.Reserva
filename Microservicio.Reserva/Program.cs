@@ -4,6 +4,7 @@ using Application.UseCase.MetodosPagos;
 using Application.UseCase.Pagos;
 using Application.UseCase.Pasajes;
 using Application.UseCase.Reservas;
+using Application.UserServices;
 using Application.UseServices;
 using Infrastructure.Command;
 using Infrastructure.Persistence;
@@ -24,6 +25,7 @@ var connectionString = builder.Configuration["ConnectionString"];
 builder.Services.AddDbContext<ReservaContext>(options => options.UseSqlServer(connectionString));
 
 builder.Services.AddScoped<IUserServiceUsuario, UserServiceUsuario>();
+builder.Services.AddScoped<IUserServiceViaje, UserServiceViaje>();
 
 builder.Services.AddScoped<IFacturaService, FacturaService>();
 builder.Services.AddScoped<IFacturaCommand, FacturaCommand>();

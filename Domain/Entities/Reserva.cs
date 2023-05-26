@@ -10,7 +10,7 @@
 
         public int PasajeroId { get; set; }
 
-        public Guid UsuarioId { get; set; }
+        public int UsuarioId { get; set; }
 
         public int ViajeId { get; set; }
 
