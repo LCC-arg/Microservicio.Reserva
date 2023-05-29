@@ -6,7 +6,7 @@ namespace Application.Interfaces
     public interface IFacturaService
     {
         FacturaResponse GetFacturaById(int facturaId);
-        List<Factura> GetFacturaList();
+        List<FacturaResponse> GetFacturaList();
         Factura CreateFactura(Factura factura);
         Factura RemoveFactura(int facturaId);
         Factura UpdateFactura(int facturaId);

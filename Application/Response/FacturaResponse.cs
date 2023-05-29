@@ -7,6 +7,6 @@
         public int Monto { get; set; }
         public DateTime Fecha { get; set; }
 
-        public PagoResponse Pago { get; set; }
+        public PagoGetResponse Pago { get; set; }
     }
 }

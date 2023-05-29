@@ -28,8 +28,19 @@ namespace Microservicio.Reserva.Controllers
         [ProducesResponseType(typeof(ReservaResponse), 201)]
         public IActionResult CreateReserva(ReservaRequest request)
         {
-            var result = _service.CreateReserva(request);
-            return new JsonResult(result) { StatusCode = 201 };
+            try
+            {
+                var result = _service.CreateReserva(request);
+                return new JsonResult(result) { StatusCode = 201 };
+            }
+            catch(Exception ex)
+            {
+                return Unauthorized(new BadRequest
+                {
+                    Message = ex.Message
+                });
+            }
+
         }
 
         [HttpGet("{id}")]

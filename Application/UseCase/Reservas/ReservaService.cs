@@ -13,14 +13,14 @@ namespace Application.UseCase.Reservas
         private readonly IReservaCommand _command;
         private readonly IReservaQuery _query;
         private readonly IUserServiceViaje _userServiceViaje;
-        private readonly IUserServiceUsuario _userServiceUsuaria;
+        private readonly IUserServiceUsuario _userServiceUsuario;
 
         public ReservaService(IReservaCommand command, IReservaQuery query, IUserServiceViaje userServiceViaje, IUserServiceUsuario userServiceUsuaria)
         {
             _command = command;
             _query = query;
             _userServiceViaje = userServiceViaje;
-            _userServiceUsuaria = userServiceUsuaria;
+            _userServiceUsuario = userServiceUsuaria;
         }
 
         public ReservaResponse GetReservaById(int reservaId)
@@ -82,7 +82,7 @@ namespace Application.UseCase.Reservas
 
             _command.InsertReserva(reserva);
 
-            var usuario = _userServiceUsuaria.ObtenerUsuario(ObtenerGuidToken(request.Token), request.Token);
+            var usuario = _userServiceUsuario.ObtenerUsuario(ObtenerGuidToken(request.Token), request.Token);
 
             var viaje = _userServiceViaje.ObtenerViaje(request.ViajeId);
 

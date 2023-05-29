@@ -1,7 +1,11 @@
 ﻿using Application.Interfaces;
 using Application.Request;
 using Application.Response;
+using Application.UserServices;
+using Application.UseServices;
 using Domain.Entities;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Application.UseCase.Pagos
 {
@@ -14,12 +18,15 @@ namespace Application.UseCase.Pagos
 
         private readonly IReservaQuery _reservaQuery;
 
-        public PagoService(IPagoCommand command, IPagoQuery query, IMetodoPagoQuery metodoPagoQuery, IReservaQuery reservaQuery)
+        private readonly IUserServiceUsuario _userServiceUsuario;
+
+        public PagoService(IPagoCommand command, IPagoQuery query, IMetodoPagoQuery metodoPagoQuery, IReservaQuery reservaQuery, IUserServiceUsuario userServiceUsuario)
         {
             _command = command;
             _query = query;
             _metodoPagoQuery = metodoPagoQuery;
             _reservaQuery = reservaQuery;
+            _userServiceUsuario = userServiceUsuario;
         }
 
         public PagoResponse GetPagoById(int pagoId)
@@ -37,7 +44,7 @@ namespace Application.UseCase.Pagos
                 Fecha = pago.Fecha,
                 Monto = pago.Monto,
 
-                Reserva = new ReservaResponse
+                Reserva = new ReservaGetResponse
                 {
                     Id = pago.Reserva.ReservaId,
                     Fecha = pago.Reserva.Fecha,
@@ -73,7 +80,7 @@ namespace Application.UseCase.Pagos
                     Fecha = pago.Fecha,
                     Monto = pago.Monto,
 
-                    Reserva = new ReservaResponse
+                    Reserva = new ReservaGetResponse
                     {
                         Id = pago.Reserva.ReservaId,
                         Fecha = pago.Reserva.Fecha,
@@ -111,6 +118,8 @@ namespace Application.UseCase.Pagos
                 throw new ArgumentException($"No se encontró el metodo de pago con el identificador {request.MetodoPago}.");
             }
 
+            var usuario = _userServiceUsuario.ObtenerUsuario(ObtenerGuidToken(request.Token), request.Token);
+
             var pago = new Pago
             {
                 Fecha = DateTime.Now.Date,
@@ -140,13 +149,19 @@ namespace Application.UseCase.Pagos
                 Fecha = pago.Fecha,
                 Monto = pago.Monto,
 
-                Reserva = new ReservaResponse
+                Reserva = new ReservaGetResponse
                 {
                     Id = pago.Reserva.ReservaId,
                     Fecha = pago.Reserva.Fecha,
                     Precio = pago.Reserva.Precio,
                     Asiento = pago.Reserva.NumeroAsiento,
                     Clase = pago.Reserva.Clase,
+                    Usuario = new UsuarioResponse
+                    {
+                        Nombre = usuario.nombre,
+                        Apellido = usuario.apellido,
+                        Dni = usuario.dni,
+                    },
                 },
 
                 MetodoPago = new MetodoPagoResponse
@@ -172,6 +187,29 @@ namespace Application.UseCase.Pagos
         public bool ExisteReservaPagada(int reservaId)
         {
             return _query.ExisteReservaPagada(reservaId);
+        }
+
+        private Guid ObtenerGuidToken(string token)
+        {
+            var jwtHandler = new JwtSecurityTokenHandler();
+            var decodedToken = jwtHandler.ReadJwtToken(token);
+
+            IEnumerable<Claim> claims = decodedToken.Claims;
+
+            string firstClaimValue = string.Empty;
+
+            foreach (Claim claim in claims)
+            {
+                string claimType = claim.Type;
+                string claimValue = claim.Value;
+
+                if (string.IsNullOrEmpty(firstClaimValue))
+                {
+                    firstClaimValue = claimValue;
+                }
+            }
+
+            return Guid.Parse(firstClaimValue);
         }
     }
 }

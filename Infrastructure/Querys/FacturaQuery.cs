@@ -29,7 +29,12 @@ namespace Infrastructure.Querys
 
         public List<Factura> GetFacturaList()
         {
-            var facturaList = _context.Facturas.ToList();
+            var facturaList = _context.Facturas
+                .Include(s => s.Pago)
+                    .ThenInclude(s => s.MetodoPago)
+                .Include(s => s.Pago)
+                    .ThenInclude(s => s.Reserva)
+                    .ToList();
 
             return facturaList;
         }

@@ -16,6 +16,14 @@ namespace Microservicio.Reserva.Controllers
             _service = service;
         }
 
+        [HttpGet]
+        [ProducesResponseType(typeof(MetodoPagoResponse), 200)]
+        public IActionResult GetMetodoPagoList()
+        {
+            var result = _service.GetFacturaList();
+            return new JsonResult(result);
+        }
+
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(FacturaResponse), 200)]
         [ProducesResponseType(typeof(BadRequest), 404)]

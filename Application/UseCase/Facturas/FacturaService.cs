@@ -30,13 +30,13 @@ namespace Application.UseCase.Facturas
                 Estado = factura.Estado,
                 Fecha = factura.Fecha,
                 Monto = factura.Monto,
-                Pago = new PagoResponse
+                Pago = new PagoGetResponse
                 {
                     Id = factura.Pago.PagoId,
                     Fecha = factura.Pago.Fecha,
                     Monto = factura.Pago.Monto,
 
-                    Reserva = new ReservaResponse
+                    Reserva = new ReservaFacturaResponse
                     {
                         Id = factura.Pago.Reserva.ReservaId,
                         Fecha = factura.Pago.Reserva.Fecha,
@@ -54,9 +54,46 @@ namespace Application.UseCase.Facturas
             };
         }
 
-        public List<Factura> GetFacturaList()
+        public List<FacturaResponse> GetFacturaList()
         {
-            return _query.GetFacturaList();
+            var facturaList = _query.GetFacturaList();
+
+            List<FacturaResponse> facturaResponseList = new List<FacturaResponse>();
+
+            foreach (var factura in facturaList)
+            {
+                var facturaResponse = new FacturaResponse
+                {
+                    Id = factura.FacturaId,
+                    Estado = factura.Estado,
+                    Monto = factura.Monto,
+                    Fecha = factura.Fecha,
+                    Pago = new PagoGetResponse
+                    {
+                        Id = factura.Pago.PagoId,
+                        Fecha = factura.Pago.Fecha,
+                        Monto = factura.Pago.Monto,
+
+                        Reserva = new ReservaFacturaResponse
+                        {
+                            Id = factura.Pago.Reserva.ReservaId,
+                            Fecha = factura.Pago.Reserva.Fecha,
+                            Precio = factura.Pago.Reserva.Precio,
+                            Asiento = factura.Pago.Reserva.NumeroAsiento,
+                            Clase = factura.Pago.Reserva.Clase,
+                        },
+
+                        MetodoPago = new MetodoPagoResponse
+                        {
+                            Id = factura.Pago.MetodoPago.MetodoPagoId,
+                            Descripcion = factura.Pago.MetodoPago.Descripcion,
+                        }
+                    }
+            };
+                facturaResponseList.Add(facturaResponse);
+            }
+
+            return facturaResponseList;
         }
 
         public Factura CreateFactura(Factura factura)

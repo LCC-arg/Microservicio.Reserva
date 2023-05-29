@@ -4,5 +4,6 @@
     {
         public int Reserva { get; set; }
         public int MetodoPago { set; get; }
+        public string Token { get; set; }
     }
 }
