@@ -1,11 +1,11 @@
-﻿namespace Application.Response
+﻿using Application.Responses;
+
+namespace Application.Response
 {
     public class ViajeResponse
     {
         public int id { get; set; }
-        public int ciudadOrigen { get; set; }
-        public int ciudadDestino { get; set; }
-        public int transporteId { get; set; }
+        public TransporteResponse transporte { get; set; }
         public string duracion { get; set; }
         public DateTime horarioSalida { get; set; }
         public DateTime horarioLlegada { get; set; }

@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.Request;
 using Application.Response;
+using Application.Responses;
 using Domain.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -102,9 +103,21 @@ namespace Application.UseCase.Reservas
                 Viaje = new ViajeResponse
                 {
                     id = viaje.id,
-                    ciudadOrigen = viaje.ciudadOrigen,
-                    ciudadDestino = viaje.ciudadDestino,
-                    transporteId = viaje.transporteId,
+                    transporte = new TransporteResponse
+                    {
+                        Id = viaje.transporte.id,
+                        TipoTransporte = new TipoTransporteResponse
+                        {
+                            Id = viaje.transporte.tipoTransporte.id,
+                            Descripcion = viaje.transporte.tipoTransporte.descripcion
+                        },
+                        CompaniaTransporte = new CompaniaTransporteResponse
+                        {
+                            Id = viaje.transporte.companiaTransporte.id,
+                            RazonSocial = viaje.transporte.companiaTransporte.razonSocial,
+                            Cuit = viaje.transporte.companiaTransporte.cuit
+                        }
+                    }, 
                     duracion = viaje.duracion,
                     horarioSalida = viaje.horarioSalida,
                     fechaLlegada = viaje.fechaLlegada,
