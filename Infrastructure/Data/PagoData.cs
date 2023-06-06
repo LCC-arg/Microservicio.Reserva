@@ -17,6 +17,7 @@ namespace Infrastructure.Data
                     Monto = 2000,
                     ReservaId = 1,
                     MetodoPagoId = 1,
+                    NumeroTarjeta = "4456 4567 4345 2334"
                 }
             );
         }

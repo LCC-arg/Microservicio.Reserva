@@ -9,13 +9,14 @@ namespace Infrastructure.Persistence
     {
         public DbSet<Reserva> Reservas { get; set; }
 
-        public DbSet<Pasaje> Pasajes { get; set; }
 
         public DbSet<Pago> Pagos { get; set; }
 
         public DbSet<MetodoPago> MetodoPagos { get; set; }
 
         public DbSet<Factura> Facturas { get; set; }
+
+        public DbSet<ReservaPasajero> ReservaPasajeros { get; set; }
 
         public ReservaContext(DbContextOptions<ReservaContext> options)
         : base(options) { }
@@ -25,7 +26,6 @@ namespace Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new ReservaConfig());
             modelBuilder.ApplyConfiguration(new ReservaData());
 
-            modelBuilder.ApplyConfiguration(new PasajeConfig());
 
             modelBuilder.ApplyConfiguration(new PagoConfig());
             modelBuilder.ApplyConfiguration(new PagoData());
@@ -35,6 +35,8 @@ namespace Infrastructure.Persistence
 
             modelBuilder.ApplyConfiguration(new FacturaConfig());
             modelBuilder.ApplyConfiguration(new FacturaData());
+
+            modelBuilder.ApplyConfiguration(new ReservaPasajeroConfig());
         }
     }
 

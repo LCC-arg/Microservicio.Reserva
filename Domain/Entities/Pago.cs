@@ -12,6 +12,9 @@
         public Factura Factura { get; set; }
 
         public int MetodoPagoId { get; set; }
+
+        public string NumeroTarjeta { get; set; }
+
         public MetodoPago MetodoPago { get; set; }
     }
 }

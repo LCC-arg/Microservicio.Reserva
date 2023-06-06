@@ -2,7 +2,6 @@ using Application.Interfaces;
 using Application.UseCase.Facturas;
 using Application.UseCase.MetodosPagos;
 using Application.UseCase.Pagos;
-using Application.UseCase.Pasajes;
 using Application.UseCase.Reservas;
 using Application.UserServices;
 using Application.UseServices;
@@ -38,10 +37,7 @@ builder.Services.AddScoped<IMetodoPagoQuery, MetodoPagoQuery>();
 builder.Services.AddScoped<IPagoService, PagoService>();
 builder.Services.AddScoped<IPagoCommand, PagoCommand>();
 builder.Services.AddScoped<IPagoQuery, PagoQuery>();
-
-builder.Services.AddScoped<IPasajeService, PasajeService>();
-builder.Services.AddScoped<IPasajeCommand, PasajeCommand>();
-builder.Services.AddScoped<IPasajeQuery, PasajeQuery>();
+;
 
 builder.Services.AddScoped<IReservaService, ReservaService>();
 builder.Services.AddScoped<IReservaCommand, ReservaCommand>();

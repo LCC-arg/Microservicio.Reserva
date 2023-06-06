@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ReservaContext))]
-    [Migration("20230529024937_init")]
-    partial class init
+    [Migration("20230606221226_agregamosReservaPasajero")]
+    partial class agregamosReservaPasajero
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -58,7 +58,7 @@ namespace Infrastructure.Migrations
                         {
                             FacturaId = 1,
                             Estado = "Paga",
-                            Fecha = new DateTime(2023, 5, 28, 0, 0, 0, 0, DateTimeKind.Local),
+                            Fecha = new DateTime(2023, 6, 6, 0, 0, 0, 0, DateTimeKind.Local),
                             Monto = 2000,
                             PagoId = 1
                         });
@@ -110,6 +110,10 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Monto")
                         .HasColumnType("int");
 
+                    b.Property<string>("NumeroTarjeta")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("ReservaId")
                         .HasColumnType("int");
 
@@ -126,9 +130,10 @@ namespace Infrastructure.Migrations
                         new
                         {
                             PagoId = 1,
-                            Fecha = new DateTime(2023, 5, 28, 0, 0, 0, 0, DateTimeKind.Local),
+                            Fecha = new DateTime(2023, 6, 6, 0, 0, 0, 0, DateTimeKind.Local),
                             MetodoPagoId = 1,
                             Monto = 2000,
+                            NumeroTarjeta = "4456 4567 4345 2334",
                             ReservaId = 1
                         });
                 });
@@ -173,9 +178,6 @@ namespace Infrastructure.Migrations
                     b.Property<int>("NumeroAsiento")
                         .HasColumnType("int");
 
-                    b.Property<int>("PasajeroId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Precio")
                         .HasColumnType("int");
 
@@ -194,13 +196,31 @@ namespace Infrastructure.Migrations
                         {
                             ReservaId = 1,
                             Clase = "Alta",
-                            Fecha = new DateTime(2023, 5, 28, 0, 0, 0, 0, DateTimeKind.Local),
+                            Fecha = new DateTime(2023, 6, 6, 0, 0, 0, 0, DateTimeKind.Local),
                             NumeroAsiento = 4,
-                            PasajeroId = 0,
                             Precio = 2000,
                             UsuarioId = 0,
                             ViajeId = 0
                         });
+                });
+
+            modelBuilder.Entity("Domain.Entities.ReservaPasajero", b =>
+                {
+                    b.Property<Guid>("ReservaPasajeroId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("PasajeroId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReservaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ReservaPasajeroId");
+
+                    b.HasIndex("ReservaId");
+
+                    b.ToTable("ReservaPasajero");
                 });
 
             modelBuilder.Entity("Domain.Entities.Factura", b =>
@@ -236,7 +256,18 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Pasaje", b =>
                 {
                     b.HasOne("Domain.Entities.Reserva", "Reserva")
-                        .WithMany("Pasajes")
+                        .WithMany()
+                        .HasForeignKey("ReservaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reserva");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ReservaPasajero", b =>
+                {
+                    b.HasOne("Domain.Entities.Reserva", "Reserva")
+                        .WithMany("ReservaPasajeros")
                         .HasForeignKey("ReservaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -260,7 +291,7 @@ namespace Infrastructure.Migrations
                     b.Navigation("Pago")
                         .IsRequired();
 
-                    b.Navigation("Pasajes");
+                    b.Navigation("ReservaPasajeros");
                 });
 #pragma warning restore 612, 618
         }

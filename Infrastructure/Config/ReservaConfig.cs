@@ -11,13 +11,13 @@ namespace Infrastructure.Config
             entityBuilder.ToTable("Reserva");
             entityBuilder.HasKey(e => e.ReservaId);
 
-            entityBuilder.HasMany(m => m.Pasajes)
-            .WithOne(cm => cm.Reserva)
-            .HasForeignKey(cm => cm.ReservaId);
-
             entityBuilder.HasOne<Pago>(m => m.Pago)
             .WithOne(cm => cm.Reserva)
             .HasForeignKey<Pago>(cm => cm.ReservaId);
+
+            entityBuilder.HasMany(m => m.ReservaPasajeros)
+            .WithOne(cm => cm.Reserva)
+            .HasForeignKey(cm => cm.ReservaId);
         }
     }
 }
