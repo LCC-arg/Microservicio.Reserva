@@ -7,7 +7,5 @@
         public int Precio { get; set; }
         public int Asiento { get; set; }
         public string Clase { get; set; }
-        public UsuarioResponse Usuario { get; set; }
-        public ViajeResponse Viaje { get; set; }
     }
 }

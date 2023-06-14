@@ -14,10 +14,6 @@ namespace Infrastructure.Config
             entityBuilder.HasOne<Pago>(m => m.Pago)
             .WithOne(cm => cm.Reserva)
             .HasForeignKey<Pago>(cm => cm.ReservaId);
-
-            entityBuilder.HasMany(m => m.ReservaPasajeros)
-            .WithOne(cm => cm.Reserva)
-            .HasForeignKey(cm => cm.ReservaId);
         }
     }
 }

@@ -10,7 +10,6 @@ namespace Infrastructure.Config
         {
             entityBuilder.ToTable("Factura");
             entityBuilder.HasKey(e => e.FacturaId);
-
         }
     }
 }

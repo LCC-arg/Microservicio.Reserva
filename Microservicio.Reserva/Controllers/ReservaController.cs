@@ -28,18 +28,8 @@ namespace Microservicio.Reserva.Controllers
         [ProducesResponseType(typeof(ReservaResponse), 201)]
         public IActionResult CreateReserva(ReservaRequest request)
         {
-            try
-            {
-                var result = _service.CreateReserva(request);
-                return new JsonResult(result) { StatusCode = 201 };
-            }
-            catch(Exception ex)
-            {
-                return Unauthorized(new BadRequest
-                {
-                    Message = ex.Message
-                });
-            }
+            var result = _service.CreateReserva(request);
+            return new JsonResult(result) { StatusCode = 201 };
 
         }
 
@@ -65,7 +55,7 @@ namespace Microservicio.Reserva.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(ReservaResponse), 200)]
         [ProducesResponseType(typeof(BadRequest), 404)]
-        public IActionResult UpdateMercaderia(int id, ReservaRequest request)
+        public IActionResult UpdateReserva(int id, ReservaRequest request)
         {
             try
             {

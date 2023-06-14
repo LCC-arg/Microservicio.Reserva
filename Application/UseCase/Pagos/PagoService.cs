@@ -1,11 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.Request;
 using Application.Response;
-using Application.UserServices;
-using Application.UseServices;
 using Domain.Entities;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace Application.UseCase.Pagos
 {
@@ -15,18 +11,14 @@ namespace Application.UseCase.Pagos
         private readonly IPagoQuery _query;
 
         private readonly IMetodoPagoQuery _metodoPagoQuery;
-
         private readonly IReservaQuery _reservaQuery;
 
-        private readonly IUserServiceUsuario _userServiceUsuario;
-
-        public PagoService(IPagoCommand command, IPagoQuery query, IMetodoPagoQuery metodoPagoQuery, IReservaQuery reservaQuery, IUserServiceUsuario userServiceUsuario)
+        public PagoService(IPagoCommand command, IPagoQuery query, IMetodoPagoQuery metodoPagoQuery, IReservaQuery reservaQuery)
         {
             _command = command;
             _query = query;
             _metodoPagoQuery = metodoPagoQuery;
             _reservaQuery = reservaQuery;
-            _userServiceUsuario = userServiceUsuario;
         }
 
         public PagoResponse GetPagoById(int pagoId)
@@ -44,7 +36,7 @@ namespace Application.UseCase.Pagos
                 Fecha = pago.Fecha,
                 Monto = pago.Monto,
 
-                Reserva = new ReservaGetResponse
+                Reserva = new ReservaResponse
                 {
                     Id = pago.Reserva.ReservaId,
                     Fecha = pago.Reserva.Fecha,
@@ -80,7 +72,7 @@ namespace Application.UseCase.Pagos
                     Fecha = pago.Fecha,
                     Monto = pago.Monto,
 
-                    Reserva = new ReservaGetResponse
+                    Reserva = new ReservaResponse
                     {
                         Id = pago.Reserva.ReservaId,
                         Fecha = pago.Reserva.Fecha,
@@ -102,74 +94,89 @@ namespace Application.UseCase.Pagos
             return pagoResponseList;
         }
 
-        public PagoResponse CreatePago(PagoRequest request)
+        public List<PagoResponse> CreatePago(PagoRequest request)
         {
-            var reserva = _reservaQuery.GetReservaById(request.Reserva);
+            List<Reserva> reservaList = new List<Reserva>();
+
+            List<Pago> pagoList = new List<Pago>();
+
+            List<PagoResponse> pagoResponseList = new List<PagoResponse>();
+
+            foreach(var reserva in request.Reservas)
+            {
+                var reservaGet = _reservaQuery.GetReservaById(reserva);
+
+                if (reservaGet == null)
+                {
+                    throw new ArgumentException($"No se encontró la reserva con el identificador {reserva}.");
+                }
+
+                reservaList.Add(reservaGet);
+            }
 
             var metodoPago = _metodoPagoQuery.GetMetodoPagoById(request.MetodoPago);
-
-            if (reserva == null)
-            {
-                throw new ArgumentException($"No se encontró la reserva con el identificador {request.Reserva}.");
-            }
 
             if (metodoPago == null)
             {
                 throw new ArgumentException($"No se encontró el metodo de pago con el identificador {request.MetodoPago}.");
             }
 
-            var usuario = _userServiceUsuario.ObtenerUsuario(ObtenerGuidToken(request.Token), request.Token);
-
-            var pago = new Pago
+            foreach (var reserva in reservaList)
             {
-                Fecha = DateTime.Now.Date,
-                Monto = reserva.Precio,
-                ReservaId = reserva.ReservaId,
-                Reserva = reserva,
-                MetodoPagoId = metodoPago.MetodoPagoId,
-                MetodoPago = metodoPago,
-            };
-
-            var factura = new Factura
-            {
-                Estado = "Paga",
-                Monto = reserva.Precio,
-                Fecha = reserva.Fecha,
-                PagoId = pago.PagoId,
-                Pago = pago
-            };
-
-            pago.Factura = factura;
-
-            _command.InsertPago(pago);
-
-            return new PagoResponse
-            {
-                Id = pago.PagoId,
-                Fecha = pago.Fecha,
-                Monto = pago.Monto,
-
-                Reserva = new ReservaGetResponse
+                var pago = new Pago
                 {
-                    Id = pago.Reserva.ReservaId,
-                    Fecha = pago.Reserva.Fecha,
-                    Precio = pago.Reserva.Precio,
-                    Asiento = pago.Reserva.NumeroAsiento,
-                    Clase = pago.Reserva.Clase,
-                    Usuario = new UsuarioResponse
+                    Fecha = DateTime.Now.Date,
+                    Monto = reserva.Precio,
+                    ReservaId = reserva.ReservaId,
+                    Reserva = reserva,
+                    MetodoPagoId = metodoPago.MetodoPagoId,
+                    MetodoPago = metodoPago,
+                    NumeroTarjeta = request.NumeroTarjeta
+                };
+
+                var factura = new Factura
+                {
+                    Estado = "Paga",
+                    Monto = reserva.Precio,
+                    Fecha = reserva.Fecha,
+                    PagoId = pago.PagoId,
+                    Pago = pago
+                };
+
+                pago.Factura = factura;
+
+                _command.InsertPago(pago);
+
+                pagoList.Add(pago);
+            }
+
+            foreach (var pago in pagoList)
+            {
+                pagoResponseList.Add(new PagoResponse
+                {
+                    Id = pago.PagoId,
+                    Fecha = pago.Fecha,
+                    Monto = pago.Monto,
+                    NumeroTarjeta = pago.NumeroTarjeta,
+
+                    Reserva = new ReservaResponse
                     {
-                        Nombre = usuario.nombre,
-                        Apellido = usuario.apellido,
-                        Dni = usuario.dni,
+                        Id = pago.Reserva.ReservaId,
+                        Fecha = pago.Reserva.Fecha,
+                        Precio = pago.Reserva.Precio,
+                        Asiento = pago.Reserva.NumeroAsiento,
+                        Clase = pago.Reserva.Clase,
                     },
-                },
 
-                MetodoPago = new MetodoPagoResponse
-                {
-                    Id = pago.MetodoPago.MetodoPagoId,
-                    Descripcion = pago.MetodoPago.Descripcion,
-                }
-            };
+                    MetodoPago = new MetodoPagoResponse
+                    {
+                        Id = pago.MetodoPago.MetodoPagoId,
+                        Descripcion = pago.MetodoPago.Descripcion,
+                    }
+                });
+            }
+
+            return pagoResponseList;
         }
 
         public Pago RemovePago(int pagoId)
@@ -189,27 +196,27 @@ namespace Application.UseCase.Pagos
             return _query.ExisteReservaPagada(reservaId);
         }
 
-        private Guid ObtenerGuidToken(string token)
-        {
-            var jwtHandler = new JwtSecurityTokenHandler();
-            var decodedToken = jwtHandler.ReadJwtToken(token);
+        //private Guid ObtenerGuidToken(string token)
+        //{
+        //    var jwtHandler = new JwtSecurityTokenHandler();
+        //    var decodedToken = jwtHandler.ReadJwtToken(token);
 
-            IEnumerable<Claim> claims = decodedToken.Claims;
+        //    IEnumerable<Claim> claims = decodedToken.Claims;
 
-            string firstClaimValue = string.Empty;
+        //    string firstClaimValue = string.Empty;
 
-            foreach (Claim claim in claims)
-            {
-                string claimType = claim.Type;
-                string claimValue = claim.Value;
+        //    foreach (Claim claim in claims)
+        //    {
+        //        string claimType = claim.Type;
+        //        string claimValue = claim.Value;
 
-                if (string.IsNullOrEmpty(firstClaimValue))
-                {
-                    firstClaimValue = claimValue;
-                }
-            }
+        //        if (string.IsNullOrEmpty(firstClaimValue))
+        //        {
+        //            firstClaimValue = claimValue;
+        //        }
+        //    }
 
-            return Guid.Parse(firstClaimValue);
-        }
+        //    return Guid.Parse(firstClaimValue);
+        //}
     }
 }

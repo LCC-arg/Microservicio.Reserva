@@ -1,10 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.Request;
 using Application.Response;
-using Application.Responses;
 using Domain.Entities;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace Application.UseCase.Reservas
 {
@@ -12,15 +9,11 @@ namespace Application.UseCase.Reservas
     {
         private readonly IReservaCommand _command;
         private readonly IReservaQuery _query;
-        private readonly IUserServiceViaje _userServiceViaje;
-        private readonly IUserServiceUsuario _userServiceUsuario;
 
-        public ReservaService(IReservaCommand command, IReservaQuery query, IUserServiceViaje userServiceViaje, IUserServiceUsuario userServiceUsuaria)
+        public ReservaService(IReservaCommand command, IReservaQuery query)
         {
             _command = command;
             _query = query;
-            _userServiceViaje = userServiceViaje;
-            _userServiceUsuario = userServiceUsuaria;
         }
 
         public ReservaResponse GetReservaById(int reservaId)
@@ -69,63 +62,41 @@ namespace Application.UseCase.Reservas
             return reservaResponseList;
         }
 
-        public ReservaResponse CreateReserva(ReservaRequest request)
+        public List<ReservaResponse> CreateReserva(ReservaRequest request)
         {
-            var reserva = new Reserva
+            List<Reserva> reservaList = new List<Reserva>();
+
+            List<ReservaResponse> reservaResponseList = new List<ReservaResponse>();
+
+            foreach (var asiento in request.NumeroAsiento)
             {
-                Fecha = DateTime.Now.Date,
-                Precio = request.Precio,
-                NumeroAsiento = request.NumeroAsiento,
-                Clase = request.Clase,
-                ViajeId = request.ViajeId,
-            };
+                var reserva = new Reserva
+                {
+                    Fecha = DateTime.Now.Date,
+                    Precio = request.Precio,
+                    NumeroAsiento = asiento,
+                    Clase = request.Clase,
+                    ViajeId = request.ViajeId,
+                };
 
-            _command.InsertReserva(reserva);
+                _command.InsertReserva(reserva);
 
-            var usuario = _userServiceUsuario.ObtenerUsuario(ObtenerGuidToken(request.Token), request.Token);
+                reservaList.Add(reserva);
+            }
 
-            var viaje = _userServiceViaje.ObtenerViaje(request.ViajeId);
-
-            return new ReservaResponse
+            foreach (var reserva in reservaList)
             {
-                Id = reserva.ReservaId,
-                Fecha = reserva.Fecha,
-                Precio = reserva.Precio,
-                Asiento = reserva.NumeroAsiento,
-                Clase = reserva.Clase,
-                Usuario = new UsuarioResponse
+                reservaResponseList.Add(new ReservaResponse
                 {
-                    Nombre = usuario.nombre,
-                    Apellido = usuario.apellido,
-                    Dni = usuario.dni,
-                },
+                    Id = reserva.ReservaId,
+                    Fecha = reserva.Fecha,
+                    Precio = reserva.Precio,
+                    Asiento = reserva.NumeroAsiento,
+                    Clase = reserva.Clase,
+                });
+            }
 
-                Viaje = new ViajeResponse
-                {
-                    id = viaje.id,
-                    transporte = new TransporteResponse
-                    {
-                        Id = viaje.transporte.id,
-                        TipoTransporte = new TipoTransporteResponse
-                        {
-                            Id = viaje.transporte.tipoTransporte.id,
-                            Descripcion = viaje.transporte.tipoTransporte.descripcion
-                        },
-                        CompaniaTransporte = new CompaniaTransporteResponse
-                        {
-                            Id = viaje.transporte.companiaTransporte.id,
-                            RazonSocial = viaje.transporte.companiaTransporte.razonSocial,
-                            Cuit = viaje.transporte.companiaTransporte.cuit
-                        }
-                    }, 
-                    duracion = viaje.duracion,
-                    horarioSalida = viaje.horarioSalida,
-                    fechaLlegada = viaje.fechaLlegada,
-                    fechaSalida = viaje.fechaSalida,
-                    horarioLlegada = viaje.horarioLlegada,
-                    tipoViaje = viaje.tipoViaje,
-                }
-            };
+            return reservaResponseList;
         }
 
         public ReservaResponse RemoveReserva(int reservaId)
@@ -156,7 +127,7 @@ namespace Application.UseCase.Reservas
                 throw new ArgumentException($"No se encontró la reserva con el identificador {reservaId}.");
             }
 
-            reserva.NumeroAsiento = request.NumeroAsiento;
+            //reserva.NumeroAsiento = request.NumeroAsiento;
             reserva.Clase = request.Clase;
             reserva.Precio = request.Precio;
 
@@ -172,27 +143,27 @@ namespace Application.UseCase.Reservas
             };
         }
 
-        private Guid ObtenerGuidToken(string token)
-        {
-            var jwtHandler = new JwtSecurityTokenHandler();
-            var decodedToken = jwtHandler.ReadJwtToken(token);
+        //private Guid ObtenerGuidToken(string token)
+        //{
+        //    var jwtHandler = new JwtSecurityTokenHandler();
+        //    var decodedToken = jwtHandler.ReadJwtToken(token);
 
-            IEnumerable<Claim> claims = decodedToken.Claims;
+        //    IEnumerable<Claim> claims = decodedToken.Claims;
 
-            string firstClaimValue = string.Empty;
+        //    string firstClaimValue = string.Empty;
 
-            foreach (Claim claim in claims)
-            {
-                string claimType = claim.Type;
-                string claimValue = claim.Value;
+        //    foreach (Claim claim in claims)
+        //    {
+        //        string claimType = claim.Type;
+        //        string claimValue = claim.Value;
 
-                if (string.IsNullOrEmpty(firstClaimValue))
-                {
-                    firstClaimValue = claimValue;
-                }
-            }
+        //        if (string.IsNullOrEmpty(firstClaimValue))
+        //        {
+        //            firstClaimValue = claimValue;
+        //        }
+        //    }
 
-            return Guid.Parse(firstClaimValue);
-        }
+        //    return Guid.Parse(firstClaimValue);
+        //}
     }
 }

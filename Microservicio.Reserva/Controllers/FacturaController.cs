@@ -17,8 +17,8 @@ namespace Microservicio.Reserva.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(MetodoPagoResponse), 200)]
-        public IActionResult GetMetodoPagoList()
+        [ProducesResponseType(typeof(FacturaResponse), 200)]
+        public IActionResult GetFacturaList()
         {
             var result = _service.GetFacturaList();
             return new JsonResult(result);

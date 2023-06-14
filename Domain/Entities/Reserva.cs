@@ -9,12 +9,9 @@
         public string Clase { get; set; }
 
         public int UsuarioId { get; set; }
-
         public int ViajeId { get; set; }
+        public int PasajeroId { get; set; }
 
         public Pago Pago { get; set; }
-
-        public ICollection<ReservaPasajero> ReservaPasajeros { get; set; }
-
     }
 }

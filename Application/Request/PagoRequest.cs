@@ -2,8 +2,8 @@
 {
     public class PagoRequest
     {
-        public int Reserva { get; set; }
+        public List<int> Reservas { get; set; }
         public int MetodoPago { set; get; }
-        public string Token { get; set; }
+        public string NumeroTarjeta { get; set; }
     }
 }

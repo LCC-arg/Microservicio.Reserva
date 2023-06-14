@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class agregamosReservaPasajero : Migration
+    public partial class ReservaDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -37,7 +37,8 @@ namespace Infrastructure.Migrations
                     NumeroAsiento = table.Column<int>(type: "int", nullable: false),
                     Clase = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UsuarioId = table.Column<int>(type: "int", nullable: false),
-                    ViajeId = table.Column<int>(type: "int", nullable: false)
+                    ViajeId = table.Column<int>(type: "int", nullable: false),
+                    PasajeroId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -67,45 +68,6 @@ namespace Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Pago_Reserva_ReservaId",
-                        column: x => x.ReservaId,
-                        principalTable: "Reserva",
-                        principalColumn: "ReservaId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Pasaje",
-                columns: table => new
-                {
-                    PasajeId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Nota = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ReservaId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Pasaje", x => x.PasajeId);
-                    table.ForeignKey(
-                        name: "FK_Pasaje_Reserva_ReservaId",
-                        column: x => x.ReservaId,
-                        principalTable: "Reserva",
-                        principalColumn: "ReservaId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ReservaPasajero",
-                columns: table => new
-                {
-                    ReservaPasajeroId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ReservaId = table.Column<int>(type: "int", nullable: false),
-                    PasajeroId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ReservaPasajero", x => x.ReservaPasajeroId);
-                    table.ForeignKey(
-                        name: "FK_ReservaPasajero_Reserva_ReservaId",
                         column: x => x.ReservaId,
                         principalTable: "Reserva",
                         principalColumn: "ReservaId",
@@ -143,21 +105,6 @@ namespace Infrastructure.Migrations
                     { 2, "Mercado Pago" }
                 });
 
-            migrationBuilder.InsertData(
-                table: "Reserva",
-                columns: new[] { "ReservaId", "Clase", "Fecha", "NumeroAsiento", "Precio", "UsuarioId", "ViajeId" },
-                values: new object[] { 1, "Alta", new DateTime(2023, 6, 6, 0, 0, 0, 0, DateTimeKind.Local), 4, 2000, 0, 0 });
-
-            migrationBuilder.InsertData(
-                table: "Pago",
-                columns: new[] { "PagoId", "Fecha", "MetodoPagoId", "Monto", "NumeroTarjeta", "ReservaId" },
-                values: new object[] { 1, new DateTime(2023, 6, 6, 0, 0, 0, 0, DateTimeKind.Local), 1, 2000, "4456 4567 4345 2334", 1 });
-
-            migrationBuilder.InsertData(
-                table: "Factura",
-                columns: new[] { "FacturaId", "Estado", "Fecha", "Monto", "PagoId" },
-                values: new object[] { 1, "Paga", new DateTime(2023, 6, 6, 0, 0, 0, 0, DateTimeKind.Local), 2000, 1 });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Factura_PagoId",
                 table: "Factura",
@@ -174,16 +121,6 @@ namespace Infrastructure.Migrations
                 table: "Pago",
                 column: "ReservaId",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Pasaje_ReservaId",
-                table: "Pasaje",
-                column: "ReservaId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ReservaPasajero_ReservaId",
-                table: "ReservaPasajero",
-                column: "ReservaId");
         }
 
         /// <inheritdoc />
@@ -191,12 +128,6 @@ namespace Infrastructure.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Factura");
-
-            migrationBuilder.DropTable(
-                name: "Pasaje");
-
-            migrationBuilder.DropTable(
-                name: "ReservaPasajero");
 
             migrationBuilder.DropTable(
                 name: "Pago");
