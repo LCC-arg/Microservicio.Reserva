@@ -24,34 +24,7 @@ namespace Application.UseCase.Facturas
                 throw new ArgumentException($"No se encontró la factura con el identificador {facturaId}.");
             }
 
-            return new FacturaResponse
-            {
-                Id = factura.FacturaId,
-                Estado = factura.Estado,
-                Fecha = factura.Fecha,
-                Monto = factura.Monto,
-                Pago = new PagoGetResponse
-                {
-                    Id = factura.Pago.PagoId,
-                    Fecha = factura.Pago.Fecha,
-                    Monto = factura.Pago.Monto,
-
-                    Reserva = new ReservaFacturaResponse
-                    {
-                        Id = factura.Pago.Reserva.ReservaId,
-                        Fecha = factura.Pago.Reserva.Fecha,
-                        Precio = factura.Pago.Reserva.Precio,
-                        Asiento = factura.Pago.Reserva.NumeroAsiento,
-                        Clase = factura.Pago.Reserva.Clase,
-                    },
-
-                    MetodoPago = new MetodoPagoResponse
-                    {
-                        Id = factura.Pago.MetodoPago.MetodoPagoId,
-                        Descripcion = factura.Pago.MetodoPago.Descripcion,
-                    }
-                }
-            };
+            return MappingFactura(factura);
         }
 
         public List<FacturaResponse> GetFacturaList()
@@ -62,55 +35,46 @@ namespace Application.UseCase.Facturas
 
             foreach (var factura in facturaList)
             {
-                var facturaResponse = new FacturaResponse
-                {
-                    Id = factura.FacturaId,
-                    Estado = factura.Estado,
-                    Monto = factura.Monto,
-                    Fecha = factura.Fecha,
-                    Pago = new PagoGetResponse
-                    {
-                        Id = factura.Pago.PagoId,
-                        Fecha = factura.Pago.Fecha,
-                        Monto = factura.Pago.Monto,
-
-                        Reserva = new ReservaFacturaResponse
-                        {
-                            Id = factura.Pago.Reserva.ReservaId,
-                            Fecha = factura.Pago.Reserva.Fecha,
-                            Precio = factura.Pago.Reserva.Precio,
-                            Asiento = factura.Pago.Reserva.NumeroAsiento,
-                            Clase = factura.Pago.Reserva.Clase,
-                        },
-
-                        MetodoPago = new MetodoPagoResponse
-                        {
-                            Id = factura.Pago.MetodoPago.MetodoPagoId,
-                            Descripcion = factura.Pago.MetodoPago.Descripcion,
-                        }
-                    }
-                };
-                facturaResponseList.Add(facturaResponse);
+                facturaResponseList.Add(MappingFactura(factura));
             }
 
             return facturaResponseList;
         }
 
-        public Factura CreateFactura(Factura factura)
+        private static FacturaResponse MappingFactura(Factura factura)
         {
-            return _command.InsertFactura(factura);
-        }
+            return new FacturaResponse
+            {
+                Id = factura.FacturaId,
+                Estado = factura.Estado,
+                Fecha = factura.Fecha,
+                Monto = factura.Monto,
+                Pago = new PagoResponse
+                {
+                    Id = factura.Pago.PagoId,
+                    Fecha = factura.Pago.Fecha,
+                    Monto = factura.Pago.Monto,
+                    NumeroTarjeta = factura.Pago.NumeroTarjeta,
 
-        public Factura RemoveFactura(int facturaId)
-        {
-            return _command.RemoveFactura(facturaId);
-        }
+                    Reserva = new ReservaResponse
+                    {
+                        Id = factura.Pago.Reserva.ReservaId,
+                        Fecha = factura.Pago.Reserva.Fecha,
+                        Precio = factura.Pago.Reserva.Precio,
+                        Asiento = factura.Pago.Reserva.NumeroAsiento,
+                        Clase = factura.Pago.Reserva.Clase,
+                        Pasajero = factura.Pago.Reserva.PasajeroId,
+                        Viaje = factura.Pago.Reserva.ViajeId,
+                        Usuario = factura.Pago.Reserva.UsuarioId,
+                    },
 
-        public Factura UpdateFactura(int facturaId)
-        {
-            var factura = _query.GetFacturaById(facturaId);
-
-            return _command.UpdateFactura(factura);
+                    MetodoPago = new MetodoPagoResponse
+                    {
+                        Id = factura.Pago.MetodoPago.MetodoPagoId,
+                        Descripcion = factura.Pago.MetodoPago.Descripcion,
+                    }
+                }
+            };
         }
     }
 }

@@ -17,16 +17,13 @@ namespace Infrastructure.Persistence
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new ReservaConfig());
-            //modelBuilder.ApplyConfiguration(new ReservaData());
 
             modelBuilder.ApplyConfiguration(new PagoConfig());
-            //modelBuilder.ApplyConfiguration(new PagoData());
 
             modelBuilder.ApplyConfiguration(new MetodoPagoConfig());
             modelBuilder.ApplyConfiguration(new MetodoPagoData());
 
             modelBuilder.ApplyConfiguration(new FacturaConfig());
-            //modelBuilder.ApplyConfiguration(new FacturaData());
         }
     }
 }

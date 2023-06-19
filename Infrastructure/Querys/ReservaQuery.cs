@@ -27,7 +27,7 @@ namespace Infrastructure.Querys
             return reservaList;
         }
 
-        public List<Reserva> GetReservaListFilters(string fecha, string clase, string orden)
+        public List<Reserva> GetReservaListFilters(string fecha, string clase, string orden, Guid usuarioId)
         {
             var reservaList = _context.Reservas
                 .OrderBy(p => p.Precio)
@@ -47,6 +47,11 @@ namespace Infrastructure.Querys
             if (orden.ToLower() == "desc")
             {
                 reservaList = reservaList.OrderByDescending(p => p.Precio).ToList();
+            }
+
+            if (usuarioId != Guid.Empty)
+            {
+                reservaList = reservaList.Where(p => p.UsuarioId == usuarioId).ToList();
             }
 
             return reservaList;

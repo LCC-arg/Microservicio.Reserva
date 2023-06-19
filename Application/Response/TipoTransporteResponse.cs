@@ -1,8 +1,0 @@
-﻿namespace Application.Responses
-{
-    public class TipoTransporteResponse
-    {
-        public int Id { get; set; }
-        public string Descripcion { get; set; }
-    }
-}

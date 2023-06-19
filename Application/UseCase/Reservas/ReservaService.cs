@@ -2,6 +2,8 @@
 using Application.Request;
 using Application.Response;
 using Domain.Entities;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Application.UseCase.Reservas
 {
@@ -25,75 +27,52 @@ namespace Application.UseCase.Reservas
                 throw new ArgumentException($"No se encontró la reserva con el identificador {reservaId}.");
             }
 
-            return new ReservaResponse
-            {
-                Id = reserva.ReservaId,
-                Fecha = reserva.Fecha,
-                Precio = reserva.Precio,
-                Asiento = reserva.NumeroAsiento,
-                Clase = reserva.Clase,
-            };
+            return MappingReserva(reserva);
         }
 
-        public List<Reserva> GetReservaList()
+        public List<ReservaResponse> GetReservaListFilters(string fecha, string clase, string orden, Guid usuarioId)
         {
-            return _query.GetReservaList();
-        }
-
-        public List<ReservaResponse> GetReservaListFilters(string fecha, string clase, string orden)
-        {
-            var reservaList = _query.GetReservaListFilters(fecha, clase, orden);
+            var reservaList = _query.GetReservaListFilters(fecha, clase, orden, usuarioId);
 
             List<ReservaResponse> reservaResponseList = new List<ReservaResponse>();
 
             foreach (var reserva in reservaList)
             {
-                var reservaResponse = new ReservaResponse
-                {
-                    Id = reserva.ReservaId,
-                    Fecha = reserva.Fecha,
-                    Precio = reserva.Precio,
-                    Asiento = reserva.NumeroAsiento,
-                    Clase = reserva.Clase,
-                };
-                reservaResponseList.Add(reservaResponse);
+                reservaResponseList.Add(MappingReserva(reserva));
             }
 
             return reservaResponseList;
         }
 
-        public List<ReservaResponse> CreateReserva(ReservaRequest request)
+        public List<ReservaResponse> CreateReserva(ReservaRequest request, string token)
         {
             List<Reserva> reservaList = new List<Reserva>();
 
             List<ReservaResponse> reservaResponseList = new List<ReservaResponse>();
 
-            foreach (var asiento in request.NumeroAsiento)
+            for (int i = 0; i < request.NumeroAsiento.Count; i++)
             {
+                int pasajero = request.Pasajeros[i];
+                int asientoAsignado = request.NumeroAsiento[i];
+
                 var reserva = new Reserva
                 {
                     Fecha = DateTime.Now.Date,
                     Precio = request.Precio,
-                    NumeroAsiento = asiento,
+                    NumeroAsiento = asientoAsignado,
                     Clase = request.Clase,
                     ViajeId = request.ViajeId,
+                    PasajeroId = pasajero,
+                    UsuarioId = this.ObtenerGuidToken(token)
                 };
 
-                _command.InsertReserva(reserva);
-
                 reservaList.Add(reserva);
+                _command.InsertReserva(reserva);
             }
 
             foreach (var reserva in reservaList)
             {
-                reservaResponseList.Add(new ReservaResponse
-                {
-                    Id = reserva.ReservaId,
-                    Fecha = reserva.Fecha,
-                    Precio = reserva.Precio,
-                    Asiento = reserva.NumeroAsiento,
-                    Clase = reserva.Clase,
-                });
+                reservaResponseList.Add(MappingReserva(reserva));
             }
 
             return reservaResponseList;
@@ -108,17 +87,10 @@ namespace Application.UseCase.Reservas
 
             var reserva = _command.RemoveReserva(reservaId);
 
-            return new ReservaResponse
-            {
-                Id = reserva.ReservaId,
-                Fecha = reserva.Fecha,
-                Precio = reserva.Precio,
-                Asiento = reserva.NumeroAsiento,
-                Clase = reserva.Clase,
-            };
+            return MappingReserva(reserva);
         }
 
-        public ReservaResponse UpdateReserva(int reservaId, ReservaRequest request)
+        public ReservaResponse UpdateReserva(int reservaId, ReservaGetRequest request)
         {
             var reserva = _query.GetReservaById(reservaId);
 
@@ -127,12 +99,42 @@ namespace Application.UseCase.Reservas
                 throw new ArgumentException($"No se encontró la reserva con el identificador {reservaId}.");
             }
 
-            //reserva.NumeroAsiento = request.NumeroAsiento;
+            reserva.NumeroAsiento = request.NumeroAsiento;
             reserva.Clase = request.Clase;
             reserva.Precio = request.Precio;
+            reserva.ViajeId = request.ViajeId;
+            reserva.PasajeroId = request.PasajeroId;
 
             _command.UpdateReserva(reserva);
 
+            return MappingReserva(reserva);
+        }
+
+        private Guid ObtenerGuidToken(string token)
+        {
+            var jwtHandler = new JwtSecurityTokenHandler();
+            var decodedToken = jwtHandler.ReadJwtToken(token);
+
+            IEnumerable<Claim> claims = decodedToken.Claims;
+
+            string firstClaimValue = string.Empty;
+
+            foreach (Claim claim in claims)
+            {
+                string claimType = claim.Type;
+                string claimValue = claim.Value;
+
+                if (string.IsNullOrEmpty(firstClaimValue))
+                {
+                    firstClaimValue = claimValue;
+                }
+            }
+
+            return Guid.Parse(firstClaimValue);
+        }
+
+        private static ReservaResponse MappingReserva(Reserva reserva)
+        {
             return new ReservaResponse
             {
                 Id = reserva.ReservaId,
@@ -140,30 +142,10 @@ namespace Application.UseCase.Reservas
                 Precio = reserva.Precio,
                 Asiento = reserva.NumeroAsiento,
                 Clase = reserva.Clase,
+                Pasajero = reserva.PasajeroId,
+                Viaje = reserva.ViajeId,
+                Usuario = reserva.UsuarioId
             };
         }
-
-        //private Guid ObtenerGuidToken(string token)
-        //{
-        //    var jwtHandler = new JwtSecurityTokenHandler();
-        //    var decodedToken = jwtHandler.ReadJwtToken(token);
-
-        //    IEnumerable<Claim> claims = decodedToken.Claims;
-
-        //    string firstClaimValue = string.Empty;
-
-        //    foreach (Claim claim in claims)
-        //    {
-        //        string claimType = claim.Type;
-        //        string claimValue = claim.Value;
-
-        //        if (string.IsNullOrEmpty(firstClaimValue))
-        //        {
-        //            firstClaimValue = claimValue;
-        //        }
-        //    }
-
-        //    return Guid.Parse(firstClaimValue);
-        //}
     }
 }

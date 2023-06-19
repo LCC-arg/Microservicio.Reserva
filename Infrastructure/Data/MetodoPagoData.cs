@@ -21,7 +21,6 @@ namespace Infrastructure.Data
                     MetodoPagoId = 2,
                     Descripcion = "Mercado Pago"
                 }
-
             );
         }
     }

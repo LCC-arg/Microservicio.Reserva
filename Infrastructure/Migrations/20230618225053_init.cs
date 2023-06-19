@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -8,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class ReservaDB : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,7 +35,7 @@ namespace Infrastructure.Migrations
                     Precio = table.Column<int>(type: "int", nullable: false),
                     NumeroAsiento = table.Column<int>(type: "int", nullable: false),
                     Clase = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UsuarioId = table.Column<int>(type: "int", nullable: false),
+                    UsuarioId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ViajeId = table.Column<int>(type: "int", nullable: false),
                     PasajeroId = table.Column<int>(type: "int", nullable: false)
                 },

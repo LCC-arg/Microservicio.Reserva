@@ -18,9 +18,9 @@ namespace Microservicio.Reserva.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(ReservaResponse), 200)]
-        public IActionResult GetReservaListFilters(string? fecha, string? clase, string? orden = "ASC")
+        public IActionResult GetReservaListFilters(string? fecha, string? clase, Guid usuarioId, string? orden = "ASC")
         {
-            var result = _service.GetReservaListFilters(fecha, clase, orden);
+            var result = _service.GetReservaListFilters(fecha, clase, orden, usuarioId);
             return new JsonResult(result);
         }
 
@@ -28,7 +28,10 @@ namespace Microservicio.Reserva.Controllers
         [ProducesResponseType(typeof(ReservaResponse), 201)]
         public IActionResult CreateReserva(ReservaRequest request)
         {
-            var result = _service.CreateReserva(request);
+            string tokenString = HttpContext.Request.Headers["Authorization"];
+            string token = tokenString.Substring(7);
+
+            var result = _service.CreateReserva(request, token);
             return new JsonResult(result) { StatusCode = 201 };
 
         }
@@ -55,7 +58,7 @@ namespace Microservicio.Reserva.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(ReservaResponse), 200)]
         [ProducesResponseType(typeof(BadRequest), 404)]
-        public IActionResult UpdateReserva(int id, ReservaRequest request)
+        public IActionResult UpdateReserva(int id, ReservaGetRequest request)
         {
             try
             {

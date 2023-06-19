@@ -6,6 +6,6 @@ namespace Application.Interfaces
     {
         Reserva GetReservaById(int reservaId);
         List<Reserva> GetReservaList();
-        List<Reserva> GetReservaListFilters(string fecha, string clase, string orden);
+        List<Reserva> GetReservaListFilters(string fecha, string clase, string orden, Guid usuarioId);
     }
 }

@@ -30,32 +30,7 @@ namespace Application.UseCase.Pagos
                 throw new ArgumentException($"No se encontró el pago con el identificador {pagoId}.");
             }
 
-            return new PagoResponse
-            {
-                Id = pago.PagoId,
-                Fecha = pago.Fecha,
-                Monto = pago.Monto,
-
-                Reserva = new ReservaResponse
-                {
-                    Id = pago.Reserva.ReservaId,
-                    Fecha = pago.Reserva.Fecha,
-                    Precio = pago.Reserva.Precio,
-                    Asiento = pago.Reserva.NumeroAsiento,
-                    Clase = pago.Reserva.Clase,
-                },
-
-                MetodoPago = new MetodoPagoResponse
-                {
-                    Id = pago.MetodoPago.MetodoPagoId,
-                    Descripcion = pago.MetodoPago.Descripcion,
-                }
-            };
-        }
-
-        public List<Pago> GetPagoList()
-        {
-            return _query.GetPagoList();
+            return MappingPago(pago);
         }
 
         public List<PagoResponse> GetPagoListFilters(int metodoPago, string fecha, int monto, string orden)
@@ -66,29 +41,7 @@ namespace Application.UseCase.Pagos
 
             foreach (var pago in pagoList)
             {
-                var pagoResponse = new PagoResponse
-                {
-                    Id = pago.PagoId,
-                    Fecha = pago.Fecha,
-                    Monto = pago.Monto,
-
-                    Reserva = new ReservaResponse
-                    {
-                        Id = pago.Reserva.ReservaId,
-                        Fecha = pago.Reserva.Fecha,
-                        Precio = pago.Reserva.Precio,
-                        Asiento = pago.Reserva.NumeroAsiento,
-                        Clase = pago.Reserva.Clase,
-                    },
-
-                    MetodoPago = new MetodoPagoResponse
-                    {
-                        Id = pago.MetodoPago.MetodoPagoId,
-                        Descripcion = pago.MetodoPago.Descripcion,
-                    }
-                };
-
-                pagoResponseList.Add(pagoResponse);
+                pagoResponseList.Add(MappingPago(pago));
             }
 
             return pagoResponseList;
@@ -102,7 +55,7 @@ namespace Application.UseCase.Pagos
 
             List<PagoResponse> pagoResponseList = new List<PagoResponse>();
 
-            foreach(var reserva in request.Reservas)
+            foreach (var reserva in request.Reservas)
             {
                 var reservaGet = _reservaQuery.GetReservaById(reserva);
 
@@ -152,48 +105,44 @@ namespace Application.UseCase.Pagos
 
             foreach (var pago in pagoList)
             {
-                pagoResponseList.Add(new PagoResponse
-                {
-                    Id = pago.PagoId,
-                    Fecha = pago.Fecha,
-                    Monto = pago.Monto,
-                    NumeroTarjeta = pago.NumeroTarjeta,
-
-                    Reserva = new ReservaResponse
-                    {
-                        Id = pago.Reserva.ReservaId,
-                        Fecha = pago.Reserva.Fecha,
-                        Precio = pago.Reserva.Precio,
-                        Asiento = pago.Reserva.NumeroAsiento,
-                        Clase = pago.Reserva.Clase,
-                    },
-
-                    MetodoPago = new MetodoPagoResponse
-                    {
-                        Id = pago.MetodoPago.MetodoPagoId,
-                        Descripcion = pago.MetodoPago.Descripcion,
-                    }
-                });
+                pagoResponseList.Add(MappingPago(pago));
             }
 
             return pagoResponseList;
         }
 
-        public Pago RemovePago(int pagoId)
-        {
-            return _command.RemovePago(pagoId);
-        }
-
-        public Pago UpdatePago(int pagoId)
-        {
-            var pago = _query.GetPagoById(pagoId);
-
-            return _command.UpdatePago(pago);
-        }
-
         public bool ExisteReservaPagada(int reservaId)
         {
             return _query.ExisteReservaPagada(reservaId);
+        }
+
+        private static PagoResponse MappingPago(Pago pago)
+        {
+            return new PagoResponse
+            {
+                Id = pago.PagoId,
+                Fecha = pago.Fecha,
+                Monto = pago.Monto,
+                NumeroTarjeta = pago.NumeroTarjeta,
+
+                Reserva = new ReservaResponse
+                {
+                    Id = pago.Reserva.ReservaId,
+                    Fecha = pago.Reserva.Fecha,
+                    Precio = pago.Reserva.Precio,
+                    Asiento = pago.Reserva.NumeroAsiento,
+                    Clase = pago.Reserva.Clase,
+                    Pasajero = pago.Reserva.PasajeroId,
+                    Viaje = pago.Reserva.ViajeId,
+                    Usuario = pago.Reserva.UsuarioId,
+                },
+
+                MetodoPago = new MetodoPagoResponse
+                {
+                    Id = pago.MetodoPago.MetodoPagoId,
+                    Descripcion = pago.MetodoPago.Descripcion,
+                }
+            };
         }
 
         //private Guid ObtenerGuidToken(string token)
