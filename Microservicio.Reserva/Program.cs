@@ -3,6 +3,7 @@ using Application.UseCase.Facturas;
 using Application.UseCase.MetodosPagos;
 using Application.UseCase.Pagos;
 using Application.UseCase.Reservas;
+using Application.UserServices;
 using Infrastructure.Command;
 using Infrastructure.Persistence;
 using Infrastructure.Querys;
@@ -36,6 +37,8 @@ builder.Services.AddScoped<IPagoQuery, PagoQuery>();
 builder.Services.AddScoped<IReservaService, ReservaService>();
 builder.Services.AddScoped<IReservaCommand, ReservaCommand>();
 builder.Services.AddScoped<IReservaQuery, ReservaQuery>();
+
+builder.Services.AddScoped<IUserServiceViaje, UserServiceViaje>();
 
 //CORS deshabilitar
 builder.Services.AddCors(options =>

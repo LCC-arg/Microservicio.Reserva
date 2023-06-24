@@ -2,6 +2,7 @@
 using Application.Request;
 using Application.Response;
 using Domain.Entities;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -12,10 +13,13 @@ namespace Application.UseCase.Reservas
         private readonly IReservaCommand _command;
         private readonly IReservaQuery _query;
 
-        public ReservaService(IReservaCommand command, IReservaQuery query)
+        private readonly IUserServiceViaje _userServiceViaje;
+
+        public ReservaService(IReservaCommand command, IReservaQuery query, IUserServiceViaje userServiceViaje)
         {
             _command = command;
             _query = query;
+            _userServiceViaje = userServiceViaje;
         }
 
         public ReservaResponse GetReservaById(int reservaId)
@@ -44,22 +48,57 @@ namespace Application.UseCase.Reservas
             return reservaResponseList;
         }
 
+        //public List<ReservaResponse> CreateReserva(ReservaRequest request, string token)
+        //{
+        //    List<Reserva> reservaList = new List<Reserva>();
+
+        //    List<ReservaResponse> reservaResponseList = new List<ReservaResponse>();
+
+        //    for (int i = 0; i < request.NumeroAsiento.Count; i++)
+        //    {
+        //        int pasajero = request.Pasajeros[i];
+        //        int asientoAsignado = request.NumeroAsiento[i];
+
+        //        var reserva = new Reserva
+        //        {
+        //            Fecha = DateTime.Now.Date,
+        //            Precio = request.Precio,
+        //            NumeroAsiento = asientoAsignado,
+        //            Clase = request.Clase,
+        //            ViajeId = request.ViajeId,
+        //            PasajeroId = pasajero,
+        //            UsuarioId = this.ObtenerGuidToken(token)
+        //        };
+
+        //        reservaList.Add(reserva);
+        //        _command.InsertReserva(reserva);
+        //    }
+
+        //    _userServiceViaje.ModificarViaje(request.ViajeId, request.NumeroAsiento.Count);
+
+        //    foreach (var reserva in reservaList)
+        //    {
+        //        reservaResponseList.Add(MappingReserva(reserva));
+        //    }
+
+        //    return reservaResponseList;
+        //}
+
         public List<ReservaResponse> CreateReserva(ReservaRequest request, string token)
         {
+            Random random = new Random();
+
             List<Reserva> reservaList = new List<Reserva>();
 
             List<ReservaResponse> reservaResponseList = new List<ReservaResponse>();
 
-            for (int i = 0; i < request.NumeroAsiento.Count; i++)
+            foreach(var pasajero in request.Pasajeros)
             {
-                int pasajero = request.Pasajeros[i];
-                int asientoAsignado = request.NumeroAsiento[i];
-
                 var reserva = new Reserva
                 {
                     Fecha = DateTime.Now.Date,
                     Precio = request.Precio,
-                    NumeroAsiento = asientoAsignado,
+                    NumeroAsiento = random.Next(1, 21),
                     Clase = request.Clase,
                     ViajeId = request.ViajeId,
                     PasajeroId = pasajero,
@@ -68,7 +107,10 @@ namespace Application.UseCase.Reservas
 
                 reservaList.Add(reserva);
                 _command.InsertReserva(reserva);
+
             }
+
+            _userServiceViaje.ModificarViaje(request.ViajeId, request.Pasajeros.Count);
 
             foreach (var reserva in reservaList)
             {
