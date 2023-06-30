@@ -97,7 +97,7 @@ namespace Application.UseCase.Reservas
                 var reserva = new Reserva
                 {
                     Fecha = DateTime.Now.Date,
-                    Precio = request.Precio,
+                    Precio = _userServiceViaje.ObtenerViaje(request.ViajeId).precio,
                     NumeroAsiento = random.Next(1, 21),
                     Clase = request.Clase,
                     ViajeId = request.ViajeId,

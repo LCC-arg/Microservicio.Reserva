@@ -26,7 +26,7 @@ namespace Application.UserServices
             }
             else
             {
-                throw new Exception($"Error al obtener el Viaje. Código de respuesta: {response.StatusCode}");
+                throw new ArgumentException($"Error al obtener el Viaje. Código de respuesta: {response.StatusCode}");
             }
         }
 
@@ -42,7 +42,7 @@ namespace Application.UserServices
             }
             else
             {
-                throw new Exception($"Error al modificar el viaje. Código de respuesta: {response.StatusCode}");
+                throw new ArgumentException($"Error al modificar el viaje. Código de respuesta: {response.StatusCode}");
             }
         }
     }

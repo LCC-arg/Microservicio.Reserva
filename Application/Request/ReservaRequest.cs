@@ -4,7 +4,6 @@
     {
         //public List<int> NumeroAsiento { get; set; }
         public string Clase { get; set; }
-        public int Precio { get; set; }
         public int ViajeId { get; set; }
         public List<int> Pasajeros { get; set; }
     }

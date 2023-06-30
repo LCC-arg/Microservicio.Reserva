@@ -28,12 +28,22 @@ namespace Microservicio.Reserva.Controllers
         [ProducesResponseType(typeof(ReservaResponse), 201)]
         public IActionResult CreateReserva(ReservaRequest request)
         {
-            string tokenString = HttpContext.Request.Headers["Authorization"];
-            string token = tokenString.Substring(7);
+            try
+            {
+                string tokenString = HttpContext.Request.Headers["Authorization"];
+                string token = tokenString.Substring(7);
 
-            var result = _service.CreateReserva(request, token);
-            return new JsonResult(result) { StatusCode = 201 };
+                var result = _service.CreateReserva(request, token);
+                return new JsonResult(result) { StatusCode = 201 };
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new BadRequest
+                {
+                    Message = ex.Message
+                });
 
+            }
         }
 
         [HttpGet("{id}")]
