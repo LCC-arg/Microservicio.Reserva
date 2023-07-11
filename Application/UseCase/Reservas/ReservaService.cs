@@ -2,6 +2,7 @@
 using Application.Request;
 using Application.Response;
 using Domain.Entities;
+using Newtonsoft.Json.Linq;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -12,8 +13,8 @@ namespace Application.UseCase.Reservas
     {
         private readonly IReservaCommand _command;
         private readonly IReservaQuery _query;
-
         private readonly IUserServiceViaje _userServiceViaje;
+
 
         public ReservaService(IReservaCommand command, IReservaQuery query, IUserServiceViaje userServiceViaje)
         {
@@ -96,7 +97,7 @@ namespace Application.UseCase.Reservas
             {
                 var reserva = new Reserva
                 {
-                    Fecha = DateTime.Now.Date,
+                    Fecha = DateTime.Now,
                     Precio = _userServiceViaje.ObtenerViaje(request.ViajeId).precio,
                     NumeroAsiento = random.Next(1, 21),
                     Clase = request.Clase,
@@ -175,8 +176,49 @@ namespace Application.UseCase.Reservas
             return Guid.Parse(firstClaimValue);
         }
 
-        private static ReservaResponse MappingReserva(Reserva reserva)
+        private  ReservaResponse MappingReserva(Reserva reserva)
         {
+            var viajeCompleto = _userServiceViaje.ObtenerViaje(reserva.ViajeId);
+            string jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(viajeCompleto);
+            JToken token = JToken.Parse(jsonString);
+            List<int> escalasResponse = new List<int>();
+            var prueba = token.SelectToken("escalas");
+            var cant= prueba.Count<JToken>();
+            for (int i = 0; i<cant;i++)
+            { escalasResponse.Add((int)prueba[i]); }
+
+            List<int> serviciosResponse = new List<int>();
+            var servicios = token.SelectToken("servicios");
+            var cantServicios = servicios.Count<JToken>();
+            for (int i = 0; i < cantServicios; i++)
+            {
+                serviciosResponse.Add((int)servicios[i]);
+
+            }
+
+            ViajeCompletoResponse viajeCompletoResponse = new ViajeCompletoResponse
+            {
+                Id = reserva.ViajeId,
+                TransporteId = (int)token.SelectToken("transporteId"),
+                TipoTransporte = (string)token.SelectToken("tipoTransporte"),
+                Duracion = (string)token.SelectToken("duracion"),
+                FechaSalida = (DateTime)token.SelectToken("fechaSalida"),
+                FechaLlegada = (DateTime)token.SelectToken("fechaLlegada"),
+                TipoViaje = (string)token.SelectToken("tipoViaje"),
+                AsientosDisponibles = (int)token.SelectToken("asientosDisponibles"),
+                Precio = (int)token.SelectToken("precio"),
+                CiudadOrigen = (int)token.SelectToken("ciudadOrigen"),
+                CiudadDestino = (int)token.SelectToken("ciudadDestino"),
+                CiudadDestinoDescripcion = (string)token.SelectToken("ciudadDestinoDescripcion"),
+                CiudadDestinoImagen = (string)token.SelectToken("ciudadDestinoImagen"),
+                Escalas=escalasResponse,
+                Servicios=serviciosResponse
+
+            };
+
+
+
+
             return new ReservaResponse
             {
                 Id = reserva.ReservaId,
@@ -185,7 +227,7 @@ namespace Application.UseCase.Reservas
                 Asiento = reserva.NumeroAsiento,
                 Clase = reserva.Clase,
                 Pasajero = reserva.PasajeroId,
-                Viaje = reserva.ViajeId,
+                Viaje = viajeCompletoResponse,
                 Usuario = reserva.UsuarioId
             };
         }

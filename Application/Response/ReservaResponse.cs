@@ -8,7 +8,7 @@
         public int Asiento { get; set; }
         public string Clase { get; set; }
         public Guid Usuario { get; set; }
-        public int Viaje { get; set; }
+        public ViajeCompletoResponse Viaje { get; set; }
         public int Pasajero { get; set; }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Application.Interfaces;
 using Application.Response;
+using Application.UserServices;
 using Domain.Entities;
+using Newtonsoft.Json.Linq;
 
 namespace Application.UseCase.Facturas
 {
@@ -9,10 +11,13 @@ namespace Application.UseCase.Facturas
         private readonly IFacturaCommand _command;
         private readonly IFacturaQuery _query;
 
-        public FacturaService(IFacturaCommand command, IFacturaQuery query)
+        private readonly IUserServiceViaje _userServiceViaje;
+
+        public FacturaService(IFacturaCommand command, IFacturaQuery query, IUserServiceViaje userServiceViaje)
         {
             _command = command;
             _query = query;
+            _userServiceViaje = userServiceViaje;
         }
 
         public FacturaResponse GetFacturaById(int facturaId)
@@ -41,8 +46,44 @@ namespace Application.UseCase.Facturas
             return facturaResponseList;
         }
 
-        private static FacturaResponse MappingFactura(Factura factura)
+        private  FacturaResponse MappingFactura(Factura factura)
         {
+            var viajeCompleto = _userServiceViaje.ObtenerViaje(factura.Pago.Reserva.ViajeId);
+            string jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(viajeCompleto);
+            JToken token = JToken.Parse(jsonString);
+            List<int> escalasResponse = new List<int>();
+            var prueba = token.SelectToken("escalas");
+            var cant = prueba.Count<JToken>();
+            for (int i = 0; i < cant; i++)
+            { escalasResponse.Add((int)prueba[i]); }
+
+            List<int> serviciosResponse = new List<int>();
+            var servicios = token.SelectToken("servicios");
+            var cantServicios = servicios.Count<JToken>();
+            for (int i = 0; i < cantServicios; i++)
+            {
+                serviciosResponse.Add((int)servicios[i]);
+
+            }
+            ViajeCompletoResponse viajeCompletoResponse = new ViajeCompletoResponse
+            {
+                Id = factura.Pago.Reserva.ViajeId,
+                TransporteId = (int)token.SelectToken("transporteId"),
+                TipoTransporte = (string)token.SelectToken("tipoTransporte"),
+                Duracion = (string)token.SelectToken("duracion"),
+                FechaSalida = (DateTime)token.SelectToken("fechaSalida"),
+                FechaLlegada = (DateTime)token.SelectToken("fechaLlegada"),
+                TipoViaje = (string)token.SelectToken("tipoViaje"),
+                AsientosDisponibles = (int)token.SelectToken("asientosDisponibles"),
+                Precio = (int)token.SelectToken("precio"),
+                CiudadOrigen = (int)token.SelectToken("ciudadOrigen"),
+                CiudadDestino = (int)token.SelectToken("ciudadDestino"),
+                CiudadDestinoDescripcion = (string)token.SelectToken("ciudadDestinoDescripcion"),
+                CiudadDestinoImagen = (string)token.SelectToken("ciudadDestinoImagen"),
+                Escalas = escalasResponse,
+                Servicios = serviciosResponse
+
+            };
             return new FacturaResponse
             {
                 Id = factura.FacturaId,
@@ -64,7 +105,7 @@ namespace Application.UseCase.Facturas
                         Asiento = factura.Pago.Reserva.NumeroAsiento,
                         Clase = factura.Pago.Reserva.Clase,
                         Pasajero = factura.Pago.Reserva.PasajeroId,
-                        Viaje = factura.Pago.Reserva.ViajeId,
+                        Viaje = viajeCompletoResponse,
                         Usuario = factura.Pago.Reserva.UsuarioId,
                     },
 

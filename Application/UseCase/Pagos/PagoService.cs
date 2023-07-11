@@ -1,7 +1,9 @@
 ﻿using Application.Interfaces;
 using Application.Request;
 using Application.Response;
+using Application.UserServices;
 using Domain.Entities;
+using Newtonsoft.Json.Linq;
 
 namespace Application.UseCase.Pagos
 {
@@ -13,12 +15,15 @@ namespace Application.UseCase.Pagos
         private readonly IMetodoPagoQuery _metodoPagoQuery;
         private readonly IReservaQuery _reservaQuery;
 
-        public PagoService(IPagoCommand command, IPagoQuery query, IMetodoPagoQuery metodoPagoQuery, IReservaQuery reservaQuery)
+        private readonly IUserServiceViaje _userServiceViaje;
+
+        public PagoService(IPagoCommand command, IPagoQuery query, IMetodoPagoQuery metodoPagoQuery, IReservaQuery reservaQuery, IUserServiceViaje userServiceViaje)
         {
             _command = command;
             _query = query;
             _metodoPagoQuery = metodoPagoQuery;
             _reservaQuery = reservaQuery;
+            _userServiceViaje = userServiceViaje;
         }
 
         public PagoResponse GetPagoById(int pagoId)
@@ -116,8 +121,46 @@ namespace Application.UseCase.Pagos
             return _query.ExisteReservaPagada(reservaId);
         }
 
-        private static PagoResponse MappingPago(Pago pago)
+        private  PagoResponse MappingPago(Pago pago)
         {
+            var viajeCompleto = _userServiceViaje.ObtenerViaje(pago.Reserva.ViajeId);
+            string jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(viajeCompleto);
+            JToken token = JToken.Parse(jsonString);
+            List<int> escalasResponse = new List<int>();
+            var prueba = token.SelectToken("escalas");
+            var cant = prueba.Count<JToken>();
+            for (int i = 0; i < cant; i++)
+            { escalasResponse.Add((int)prueba[i]); }
+
+            List<int> serviciosResponse = new List<int>();
+            var servicios = token.SelectToken("servicios");
+            var cantServicios = servicios.Count<JToken>();
+            for (int i = 0; i < cantServicios; i++)
+            {
+                serviciosResponse.Add((int)servicios[i]);
+
+            }
+
+            ViajeCompletoResponse viajeCompletoResponse = new ViajeCompletoResponse
+            {
+                Id = pago.Reserva.ViajeId,
+                TransporteId = (int)token.SelectToken("transporteId"),
+                TipoTransporte = (string)token.SelectToken("tipoTransporte"),
+                Duracion = (string)token.SelectToken("duracion"),
+                FechaSalida = (DateTime)token.SelectToken("fechaSalida"),
+                FechaLlegada = (DateTime)token.SelectToken("fechaLlegada"),
+                TipoViaje = (string)token.SelectToken("tipoViaje"),
+                AsientosDisponibles = (int)token.SelectToken("asientosDisponibles"),
+                Precio = (int)token.SelectToken("precio"),
+                CiudadOrigen = (int)token.SelectToken("ciudadOrigen"),
+                CiudadDestino = (int)token.SelectToken("ciudadDestino"),
+                CiudadDestinoDescripcion = (string)token.SelectToken("ciudadDestinoDescripcion"),
+                CiudadDestinoImagen = (string)token.SelectToken("ciudadDestinoImagen"),
+                Escalas = escalasResponse,
+                Servicios = serviciosResponse
+
+            };
+
             return new PagoResponse
             {
                 Id = pago.PagoId,
@@ -133,7 +176,7 @@ namespace Application.UseCase.Pagos
                     Asiento = pago.Reserva.NumeroAsiento,
                     Clase = pago.Reserva.Clase,
                     Pasajero = pago.Reserva.PasajeroId,
-                    Viaje = pago.Reserva.ViajeId,
+                    Viaje = viajeCompletoResponse,
                     Usuario = pago.Reserva.UsuarioId,
                 },
 
