@@ -9,6 +9,6 @@
         public string Clase { get; set; }
         public Guid Usuario { get; set; }
         public ViajeCompletoResponse Viaje { get; set; }
-        public int Pasajero { get; set; }
+        public PasajeroResponse Pasajero { get; set; }
     }
 }

@@ -84,6 +84,21 @@ namespace Application.UseCase.Facturas
                 Servicios = serviciosResponse
 
             };
+
+            var pasajeroCompleto = _userServiceViaje.ObtenerPasajero(factura.Pago.Reserva.PasajeroId);
+
+            string jsonPasajero = Newtonsoft.Json.JsonConvert.SerializeObject(pasajeroCompleto);
+            JToken tokenPasajero = JToken.Parse(jsonPasajero);
+
+
+            PasajeroResponse pasajeroCompletoResponse = new PasajeroResponse
+            {
+                Id = factura.Pago.Reserva.PasajeroId,
+                Nombre = (string)tokenPasajero.SelectToken("nombre"),
+                Apellido = (string)tokenPasajero.SelectToken("apellido"),
+                Dni = (int)tokenPasajero.SelectToken("dni")
+            };
+
             return new FacturaResponse
             {
                 Id = factura.FacturaId,
@@ -104,7 +119,7 @@ namespace Application.UseCase.Facturas
                         Precio = factura.Pago.Reserva.Precio,
                         Asiento = factura.Pago.Reserva.NumeroAsiento,
                         Clase = factura.Pago.Reserva.Clase,
-                        Pasajero = factura.Pago.Reserva.PasajeroId,
+                        Pasajero = pasajeroCompletoResponse,
                         Viaje = viajeCompletoResponse,
                         Usuario = factura.Pago.Reserva.UsuarioId,
                     },

@@ -99,7 +99,7 @@ namespace Application.UseCase.Reservas
                 {
                     Fecha = DateTime.Now,
                     Precio = _userServiceViaje.ObtenerViaje(request.ViajeId).precio,
-                    NumeroAsiento = random.Next(1, 21),
+                    NumeroAsiento = random.Next(1, 71),
                     Clase = request.Clase,
                     ViajeId = request.ViajeId,
                     PasajeroId = pasajero,
@@ -179,11 +179,13 @@ namespace Application.UseCase.Reservas
         private  ReservaResponse MappingReserva(Reserva reserva)
         {
             var viajeCompleto = _userServiceViaje.ObtenerViaje(reserva.ViajeId);
+
             string jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(viajeCompleto);
             JToken token = JToken.Parse(jsonString);
+
             List<int> escalasResponse = new List<int>();
             var prueba = token.SelectToken("escalas");
-            var cant= prueba.Count<JToken>();
+            var cant = prueba.Count<JToken>();
             for (int i = 0; i<cant;i++)
             { escalasResponse.Add((int)prueba[i]); }
 
@@ -193,7 +195,6 @@ namespace Application.UseCase.Reservas
             for (int i = 0; i < cantServicios; i++)
             {
                 serviciosResponse.Add((int)servicios[i]);
-
             }
 
             ViajeCompletoResponse viajeCompletoResponse = new ViajeCompletoResponse
@@ -216,8 +217,19 @@ namespace Application.UseCase.Reservas
 
             };
 
+            var pasajeroCompleto = _userServiceViaje.ObtenerPasajero(reserva.PasajeroId);
+
+            string jsonPasajero = Newtonsoft.Json.JsonConvert.SerializeObject(pasajeroCompleto);
+            JToken tokenPasajero = JToken.Parse(jsonPasajero);
 
 
+            PasajeroResponse pasajeroCompletoResponse = new PasajeroResponse
+            {
+               Id = reserva.PasajeroId,
+               Nombre = (string)tokenPasajero.SelectToken("nombre"),
+               Apellido = (string)tokenPasajero.SelectToken("apellido"),
+               Dni = (int)tokenPasajero.SelectToken("dni")
+            };
 
             return new ReservaResponse
             {
@@ -226,7 +238,7 @@ namespace Application.UseCase.Reservas
                 Precio = reserva.Precio,
                 Asiento = reserva.NumeroAsiento,
                 Clase = reserva.Clase,
-                Pasajero = reserva.PasajeroId,
+                Pasajero = pasajeroCompletoResponse,
                 Viaje = viajeCompletoResponse,
                 Usuario = reserva.UsuarioId
             };

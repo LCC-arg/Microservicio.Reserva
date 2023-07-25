@@ -30,6 +30,21 @@ namespace Application.UserServices
             }
         }
 
+        public dynamic ObtenerPasajero(int pasajeroId)
+        {
+            HttpResponseMessage response = _httpClient.GetAsync($"Pasajeros/{pasajeroId}").Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                dynamic viaje = response.Content.ReadAsAsync<dynamic>().Result;
+                return viaje;
+            }
+            else
+            {
+                throw new ArgumentException($"Error al obtener el Pasajero. Código de respuesta: {response.StatusCode}");
+            }
+        }
+
         public dynamic ModificarViaje(int viajeId, int asientosDisponibles)
         {
 
